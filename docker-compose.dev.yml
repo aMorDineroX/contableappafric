@@ -1,0 +1,15 @@
+
+services:
+  app:
+    develop:
+      watch:
+        - action: sync
+          path: ./src
+          target: /app/src
+          ignore:
+            - node_modules/
+            - .git/
+            - dist/
+        - action: rebuild
+          path: package.json
+    command: npm run dev

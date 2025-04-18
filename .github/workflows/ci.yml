@@ -7,8 +7,8 @@ on:
     branches: [ main ]
 
 env:
-  POSTGRES_USER: ${{ secrets.DB_USER }}
-  POSTGRES_PASSWORD: ${{ secrets.DB_PASSWORD }}
+  DB_USER: ${{ secrets.DB_USER }}
+  DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
 
 jobs:
   build:
@@ -22,7 +22,8 @@ jobs:
     
     - name: Build and test
       env:
-        NODE_ENV: test
+        POSTGRES_USER: ${{ secrets.DB_USER }}
+        POSTGRES_PASSWORD: ${{ secrets.DB_PASSWORD }}
       run: |
         docker-compose build
         docker-compose up -d

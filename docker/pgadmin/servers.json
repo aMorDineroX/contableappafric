@@ -1,0 +1,15 @@
+{
+  "Servers": {
+    "1": {
+      "Name": "ContAfricaX DB",
+      "Group": "Servers",
+      "Host": "db",
+      "Port": 5432,
+      "MaintenanceDB": "postgres",
+      "Username": "admin",
+      "Password": "password",
+      "SSLMode": "disable",
+      "SavePassword": true
+    }
+  }
+}

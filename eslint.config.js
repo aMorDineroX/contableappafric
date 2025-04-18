@@ -26,3 +26,5 @@ export default tseslint.config(
     },
   },
 )
+
+// Garder uniquement les règles essentielles pour React et TypeScript

@@ -1,0 +1,30 @@
+FROM node:18
+
+WORKDIR /app
+
+# Installation des dépendances système
+RUN apt-get update && apt-get install -y \
+    python3 \
+    make \
+    g++ \
+    curl
+
+# Copie des fichiers de configuration
+COPY package*.json ./
+COPY tsconfig*.json ./
+COPY .babelrc ./
+
+# Installation des dépendances
+RUN npm install
+
+# Copie du reste du code
+COPY . .
+
+# Variables d'environnement
+ENV NODE_ENV=development
+ENV TS_NODE_PROJECT=tsconfig.server.json
+
+# Change to port 3000 as specified in docker-compose.yml
+EXPOSE 3000
+
+CMD ["npm", "run", "server"]

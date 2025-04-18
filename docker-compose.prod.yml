@@ -10,6 +10,13 @@ services:
     ports:
       - "80:80"
     restart: always
+    deploy:
+      replicas: 2
+      resources:
+        limits:
+          memory: 1GB
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost"]
 
   db:
     image: postgres:latest
@@ -19,6 +26,16 @@ services:
       - POSTGRES_DB=contafricax
       - POSTGRES_USER=${DB_USER}
       - POSTGRES_PASSWORD=${DB_PASSWORD}
+    deploy:
+      resources:
+        limits:
+          memory: 2GB
+    command: >
+      postgres 
+      -c shared_buffers=512MB 
+      -c work_mem=32MB
+      -c maintenance_work_mem=256MB
+      -c effective_cache_size=2GB
 
 volumes:
   db_prod:

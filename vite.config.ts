@@ -2,33 +2,32 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import path from 'path'
 
-// https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
   server: {
     host: '0.0.0.0',
     port: 5173,
     watch: {
-      usePolling: true
+      usePolling: true,
+      interval: 100
     },
     hmr: {
-      overlay: true
+      host: 'localhost',
+      protocol: 'ws',
+      port: 5173,
+      clientPort: 5173,
+      timeout: 120000,
+      overlay: false
+    }
+  },
+  css: {
+    modules: {
+      localsConvention: 'camelCase'
     }
   },
   resolve: {
     alias: {
-      "@": path.resolve(__dirname, "./"),
-      '@components': path.resolve(__dirname, './components'),
-      '@styles': path.resolve(__dirname, './src/styles'),
-    },
-  },
-  build: {
-    sourcemap: true,
-    rollupOptions: {
-      onwarn(warning, warn) {
-        if (warning.code === 'MISSING_NODE_BUILTINS') return
-        warn(warning)
-      }
+      '@': path.resolve(__dirname, 'src')
     }
   }
 })
