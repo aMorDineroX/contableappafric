@@ -12,11 +12,11 @@ import Clients from './pages/Clients';
 // Pages de l'application
 import TransactionsPage from './pages/TransactionsPage';
 import SupplierPage from './pages/SupplierPage';
+import ProfilePage from './pages/ProfilePage';
+import Reports from './pages/Reports';
 
 // Pages fictives pour la navigation
-const Reports = () => <div className="p-8"><h1 className="text-3xl font-bold mb-4">Rapports</h1><p>Cette page est en cours de développement.</p></div>;
 const Settings = () => <div className="p-8"><h1 className="text-3xl font-bold mb-4">Paramètres</h1><p>Cette page est en cours de développement.</p></div>;
-const Profile = () => <div className="p-8"><h1 className="text-3xl font-bold mb-4">Profil</h1><p>Cette page est en cours de développement.</p></div>;
 
 // Wrapper component to access location
 const AnimatedRoutes = () => {
@@ -86,7 +86,7 @@ const AnimatedRoutes = () => {
           <Route path="/profile" element={
             <AuthGuard>
               <Layout>
-                <Profile />
+                <ProfilePage />
               </Layout>
             </AuthGuard>
           } />
