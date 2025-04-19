@@ -9,10 +9,12 @@ import Dashboard from './pages/Dashboard';
 import ReactLandingPage from './pages/ReactLandingPage';
 import Clients from './pages/Clients';
 
-// Pages fictives pour la navigation
+// Pages de l'application
 import TransactionsPage from './pages/TransactionsPage';
+import SupplierPage from './pages/SupplierPage';
+
+// Pages fictives pour la navigation
 const Reports = () => <div className="p-8"><h1 className="text-3xl font-bold mb-4">Rapports</h1><p>Cette page est en cours de développement.</p></div>;
-const Suppliers = () => <div className="p-8"><h1 className="text-3xl font-bold mb-4">Fournisseurs</h1><p>Cette page est en cours de développement.</p></div>;
 const Settings = () => <div className="p-8"><h1 className="text-3xl font-bold mb-4">Paramètres</h1><p>Cette page est en cours de développement.</p></div>;
 const Profile = () => <div className="p-8"><h1 className="text-3xl font-bold mb-4">Profil</h1><p>Cette page est en cours de développement.</p></div>;
 
@@ -63,7 +65,7 @@ const AnimatedRoutes = () => {
           <Route path="/suppliers" element={
             <AuthGuard>
               <Layout>
-                <Suppliers />
+                <SupplierPage />
               </Layout>
             </AuthGuard>
           } />
