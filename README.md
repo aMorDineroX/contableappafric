@@ -175,6 +175,29 @@ npm run build
 - **Visualisation graphique** des flux financiers
 - **Support multi-devises** (FCFA, EUR, USD, etc.)
 
+### Gestion des Fournisseurs
+- **Ajout, modification et suppression** de fournisseurs avec validation des données
+- **Filtrage avancé** par statut, pays, catégorie et solde à payer
+- **Suivi des achats et paiements** par fournisseur
+- **Exportation des données** en PDF et Excel
+- **Gestion des notes** pour chaque fournisseur
+- **Interface réactive** avec états de chargement et gestion des erreurs
+
+### Rapports Financiers
+- **Tableaux de bord interactifs** avec graphiques et tableaux de données
+- **Rapports personnalisables** (financier, ventes, dépenses, taxes)
+- **Filtrage avancé** par période et plage de dates personnalisée
+- **Comparaison année par année** pour analyse des tendances
+- **Exportation des données** en PDF, Excel et impression
+- **Calendrier fiscal** avec rappels des échéances importantes
+
+### Rapports Financiers Avancés
+- **Bilan comptable** conforme aux normes OHADA
+- **Compte de résultat** détaillé avec analyse des marges
+- **Analyse des actifs, passifs et capitaux propres**
+- **Suivi des ratios financiers** importants
+- **États financiers exportables** en formats PDF et Excel
+
 ### Authentification et Sécurité
 - **Système de connexion/inscription** sécurisé
 - **Mode démo** pour tester sans API
@@ -211,15 +234,26 @@ ContAfricaX
 │   │   ├── Gestion des notes et documents
 │   │   └── Opérations par lot (sélection multiple)
 │   │
-│   ├── Fournisseurs (/suppliers)
-│   │   ├── Liste des fournisseurs
-│   │   ├── Détails fournisseur
-│   │   └── Formulaire fournisseur
+│   ├── Fournisseurs (/suppliers) - IMPLÉMENTÉ
+│   │   ├── Gestion complète des fournisseurs (ajout, modification, suppression)
+│   │   ├── Filtrage avancé et recherche
+│   │   ├── Suivi des paiements et des achats
+│   │   ├── Exportation des données (PDF, Excel)
+│   │   └── Gestion des notes et informations détaillées
 │   │
-│   ├── Rapports (/reports)
-│   │   ├── Rapports financiers personnalisables
-│   │   ├── Graphiques d'analyse avancés
-│   │   └── Export de données (PDF, Excel, CSV)
+│   ├── Rapports (/reports) - IMPLÉMENTÉ
+│   │   ├── Rapports financiers personnalisables (financier, ventes, dépenses, taxes)
+│   │   ├── Graphiques d'analyse interactifs avec vues tabulaires
+│   │   ├── Filtrage par période et plage de dates personnalisée
+│   │   ├── Comparaison avec l'année précédente
+│   │   ├── Export de données (PDF, Excel, impression)
+│   │   └── Calendrier fiscal avec rappels
+│   ├── Rapports Avancés (/advanced-reports) - IMPLÉMENTÉ
+│   │   ├── Bilan comptable conforme aux normes OHADA
+│   │   ├── Compte de résultat détaillé
+│   │   ├── Analyse des actifs, passifs et capitaux propres
+│   │   ├── Analyse des revenus et dépenses par catégorie
+│   │   └── Export des états financiers en PDF et Excel
 │   │
 │   ├── Paramètres (/settings)
 │   │   ├── Préférences utilisateur
@@ -268,11 +302,12 @@ ContAfricaX
 - ✅ Gestion complète des transactions
 - ✅ Support multi-devises (FCFA, EUR, USD, etc.)
 - ✅ Tableau de bord avec statistiques de base
-- ⭕ Gestion des fournisseurs
-- ⭕ Rapports financiers de base
+- ✅ Rapports financiers interactifs
+- ✅ Gestion des fournisseurs
 
 ### Phase 3 - Fonctionnalités Avancées (Planifié)
-- ⭕ Rapports financiers avancés (bilan, compte de résultat)
+- ✅ Rapports financiers interactifs avec exportation
+- ✅ Rapports financiers avancés (bilan, compte de résultat)
 - ⭕ Intégration des systèmes de paiement mobile africains
 - ⭕ Conformité fiscale par pays africain
 - ⭕ Gestion des stocks et inventaire
@@ -304,6 +339,24 @@ ContAfricaX
 ![Transactions](docs/images/transactions.png)
 
 *Interface de gestion des transactions avec filtrage avancé et support multi-devises.*
+
+### Page Rapports
+
+![Rapports](docs/images/reports.png)
+
+*La page Rapports offre des analyses financières détaillées avec graphiques interactifs, vues tabulaires et options d'exportation.*
+
+### Page Fournisseurs
+
+![Fournisseurs](docs/images/suppliers.png)
+
+*La page Fournisseurs permet de gérer efficacement vos fournisseurs avec filtrage avancé, exportation et suivi des paiements.*
+
+### Rapports Financiers Avancés
+
+![Rapports Avancés](docs/images/advanced-reports.png)
+
+*Les rapports financiers avancés offrent un bilan comptable et un compte de résultat conformes aux normes OHADA, avec exportation en PDF et Excel.*
 
 ## 👨‍👨‍👧‍👧 Contribution
 

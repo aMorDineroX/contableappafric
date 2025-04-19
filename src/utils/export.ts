@@ -22,20 +22,20 @@ interface ExportData {
  */
 export const exportToPDF = (exportData: ExportData): void => {
   const { title, subtitle, data, columns } = exportData;
-  
+
   // Création du document PDF
   const doc = new jsPDF();
-  
+
   // Ajout du titre
   doc.setFontSize(18);
   doc.text(title, 14, 22);
-  
+
   // Ajout du sous-titre si présent
   if (subtitle) {
     doc.setFontSize(12);
     doc.text(subtitle, 14, 30);
   }
-  
+
   // Ajout de la date d'exportation
   const exportDate = new Date().toLocaleDateString('fr-FR', {
     year: 'numeric',
@@ -46,16 +46,16 @@ export const exportToPDF = (exportData: ExportData): void => {
   });
   doc.setFontSize(10);
   doc.text(`Exporté le ${exportDate}`, 14, subtitle ? 38 : 30);
-  
+
   // Préparation des données pour le tableau
   const tableHeaders = columns.map(col => col.header);
-  const tableData = data.map(item => 
+  const tableData = data.map(item =>
     columns.map(col => {
       const value = item[col.dataKey];
       return col.format ? col.format(value) : value;
     })
   );
-  
+
   // Ajout du tableau
   (doc as any).autoTable({
     head: [tableHeaders],
@@ -76,7 +76,7 @@ export const exportToPDF = (exportData: ExportData): void => {
       fillColor: [245, 245, 245],
     },
   });
-  
+
   // Enregistrement du PDF
   doc.save(`${title.toLowerCase().replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.pdf`);
 };
@@ -87,25 +87,25 @@ export const exportToPDF = (exportData: ExportData): void => {
  */
 export const exportToExcel = (exportData: ExportData): void => {
   const { title, data, columns } = exportData;
-  
+
   // Préparation des données pour Excel
   const excelData = [
     columns.map(col => col.header), // En-têtes
-    ...data.map(item => 
+    ...data.map(item =>
       columns.map(col => {
         const value = item[col.dataKey];
         return col.format ? col.format(value) : value;
       })
     )
   ];
-  
+
   // Création du workbook et de la worksheet
   const wb = XLSX.utils.book_new();
   const ws = XLSX.utils.aoa_to_sheet(excelData);
-  
+
   // Ajout de la worksheet au workbook
   XLSX.utils.book_append_sheet(wb, ws, 'Rapport');
-  
+
   // Enregistrement du fichier Excel
   XLSX.writeFile(wb, `${title.toLowerCase().replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.xlsx`);
 };
@@ -131,25 +131,25 @@ export const prepareFinancialExportData = (
     expense: expenseData[index],
     profit: profitData[index],
   }));
-  
+
   return {
     title: 'Rapport Financier',
     subtitle: `Période: ${months[0]} - ${months[months.length - 1]}`,
     data,
     columns: [
       { header: 'Mois', dataKey: 'month' },
-      { 
-        header: 'Revenus', 
+      {
+        header: 'Revenus',
         dataKey: 'revenue',
         format: (value) => formatCurrency(value, currency)
       },
-      { 
-        header: 'Dépenses', 
+      {
+        header: 'Dépenses',
         dataKey: 'expense',
         format: (value) => formatCurrency(value, currency)
       },
-      { 
-        header: 'Profit', 
+      {
+        header: 'Profit',
         dataKey: 'profit',
         format: (value) => formatCurrency(value, currency)
       },
@@ -167,20 +167,20 @@ export const prepareSalesExportData = (
   currency: Currency
 ): ExportData => {
   const totalSales = countrySalesData.reduce((sum, item) => sum + item.amount, 0);
-  
+
   const data = countrySalesData.map(item => ({
     country: item.country,
     amount: item.amount,
     percentage: (item.amount / totalSales * 100).toFixed(2) + '%'
   }));
-  
+
   return {
     title: 'Rapport des Ventes par Pays',
     data,
     columns: [
       { header: 'Pays', dataKey: 'country' },
-      { 
-        header: 'Montant', 
+      {
+        header: 'Montant',
         dataKey: 'amount',
         format: (value) => formatCurrency(value, currency)
       },
@@ -207,19 +207,19 @@ export const prepareExpensesExportData = (
     percentage: expenseCategoryData[index],
     amount: totalExpenses * expenseCategoryData[index] / 100
   }));
-  
+
   return {
     title: 'Rapport des Dépenses par Catégorie',
     data,
     columns: [
       { header: 'Catégorie', dataKey: 'category' },
-      { 
-        header: 'Montant', 
+      {
+        header: 'Montant',
         dataKey: 'amount',
         format: (value) => formatCurrency(value, currency)
       },
-      { 
-        header: 'Pourcentage', 
+      {
+        header: 'Pourcentage',
         dataKey: 'percentage',
         format: (value) => value + '%'
       },
@@ -241,10 +241,60 @@ export const prepareTaxesExportData = (
     data: taxData,
     columns: [
       { header: 'Type de Taxe', dataKey: 'type' },
-      { 
-        header: 'Montant', 
+      {
+        header: 'Montant',
         dataKey: 'amount',
         format: (value) => formatCurrency(value, currency)
+      },
+    ]
+  };
+};
+
+/**
+ * Prépare les données de fournisseurs pour l'exportation
+ * @param suppliers Liste des fournisseurs
+ * @param currency Devise
+ */
+export const prepareSuppliersExportData = (
+  suppliers: Array<{
+    id: number;
+    name: string;
+    email: string;
+    phone: string;
+    country: string;
+    category: string;
+    totalPurchases: number;
+    outstandingPayable: number;
+    status: string;
+    lastOrderDate: string;
+  }>,
+  currency: Currency
+): ExportData => {
+  return {
+    title: 'Liste des Fournisseurs',
+    subtitle: `Exporté le ${new Date().toLocaleDateString('fr-FR')}`,
+    data: suppliers,
+    columns: [
+      { header: 'Nom', dataKey: 'name' },
+      { header: 'Email', dataKey: 'email' },
+      { header: 'Téléphone', dataKey: 'phone' },
+      { header: 'Pays', dataKey: 'country' },
+      { header: 'Catégorie', dataKey: 'category' },
+      {
+        header: 'Achats Totaux',
+        dataKey: 'totalPurchases',
+        format: (value) => formatCurrency(value, currency)
+      },
+      {
+        header: 'À Payer',
+        dataKey: 'outstandingPayable',
+        format: (value) => formatCurrency(value, currency)
+      },
+      { header: 'Statut', dataKey: 'status' },
+      {
+        header: 'Dernière Commande',
+        dataKey: 'lastOrderDate',
+        format: (value) => new Date(value).toLocaleDateString('fr-FR')
       },
     ]
   };
