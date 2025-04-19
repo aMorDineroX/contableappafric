@@ -15,6 +15,7 @@ import SupplierPage from './pages/SupplierPage';
 import ProfilePage from './pages/ProfilePage';
 import Reports from './pages/Reports';
 import AdvancedReports from './pages/AdvancedReports';
+import MobilePaymentsPage from './pages/MobilePaymentsPage';
 
 // Pages fictives pour la navigation
 const Settings = () => <div className="p-8"><h1 className="text-3xl font-bold mb-4">Paramètres</h1><p>Cette page est en cours de développement.</p></div>;
@@ -95,6 +96,13 @@ const AnimatedRoutes = () => {
             <AuthGuard>
               <Layout>
                 <ProfilePage />
+              </Layout>
+            </AuthGuard>
+          } />
+          <Route path="/mobile-payments" element={
+            <AuthGuard>
+              <Layout>
+                <MobilePaymentsPage />
               </Layout>
             </AuthGuard>
           } />

@@ -198,6 +198,14 @@ npm run build
 - **Suivi des ratios financiers** importants
 - **États financiers exportables** en formats PDF et Excel
 
+### Paiements Mobiles Africains
+- **Intégration multi-fournisseurs** (Orange Money, MTN Mobile Money, Wave, M-Pesa)
+- **Initiation et suivi des paiements** en temps réel
+- **Support multi-pays** adapté aux spécificités locales
+- **Tableaux de bord et statistiques** détaillés
+- **Filtrage avancé** des transactions par statut, date, montant, etc.
+- **Gestion des remboursements** et annulations
+
 ### Authentification et Sécurité
 - **Système de connexion/inscription** sécurisé
 - **Mode démo** pour tester sans API
@@ -254,6 +262,12 @@ ContAfricaX
 │   │   ├── Analyse des actifs, passifs et capitaux propres
 │   │   ├── Analyse des revenus et dépenses par catégorie
 │   │   └── Export des états financiers en PDF et Excel
+│   ├── Paiements Mobiles (/mobile-payments) - IMPLÉMENTÉ
+│   │   ├── Intégration avec Orange Money, MTN Mobile Money, Wave, M-Pesa
+│   │   ├── Initiation et suivi des paiements
+│   │   ├── Statistiques et rapports de paiement
+│   │   ├── Filtrage avancé des transactions
+│   │   └── Support multi-pays (Sénégal, Côte d'Ivoire, Kenya, etc.)
 │   │
 │   ├── Paramètres (/settings)
 │   │   ├── Préférences utilisateur
@@ -308,7 +322,7 @@ ContAfricaX
 ### Phase 3 - Fonctionnalités Avancées (Planifié)
 - ✅ Rapports financiers interactifs avec exportation
 - ✅ Rapports financiers avancés (bilan, compte de résultat)
-- ⭕ Intégration des systèmes de paiement mobile africains
+- ✅ Intégration des systèmes de paiement mobile africains
 - ⭕ Conformité fiscale par pays africain
 - ⭕ Gestion des stocks et inventaire
 - ⭕ Facturation automatisée
@@ -357,6 +371,12 @@ ContAfricaX
 ![Rapports Avancés](docs/images/advanced-reports.png)
 
 *Les rapports financiers avancés offrent un bilan comptable et un compte de résultat conformes aux normes OHADA, avec exportation en PDF et Excel.*
+
+### Paiements Mobiles Africains
+
+![Paiements Mobiles](docs/images/mobile-payments.png)
+
+*La page de paiements mobiles permet d'initier et de suivre les paiements via les principaux fournisseurs africains comme Orange Money, MTN Mobile Money, Wave et M-Pesa.*
 
 ## 👨‍👨‍👧‍👧 Contribution
 
