@@ -21,21 +21,66 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // Vérifier si l'utilisateur est déjà authentifié au chargement
   useEffect(() => {
     const checkAuth = async () => {
+      console.log('Vérification de l\'authentification...');
       const token = localStorage.getItem('token');
+
+      // Vérifier si c'est un token de démo
+      if (token === 'demo-token-for-testing') {
+        console.log('Token de démo détecté, activation du mode démo');
+        const demoUser = {
+          id: 1,
+          name: 'Utilisateur Démo',
+          email: 'demo@contafricax.com',
+          role: 'user',
+          emailVerified: true
+        };
+        setUser(demoUser);
+        setIsAuthenticated(true);
+        setLoading(false);
+        return;
+      }
+
       if (token) {
+        console.log('Token trouvé, vérification...');
         try {
-          const isValid = await AuthAPI.verifyToken(token);
-          if (isValid) {
-            // Ici, vous pourriez faire un appel pour récupérer les données de l'utilisateur
-            // Pour l'instant, nous allons simplement marquer l'utilisateur comme authentifié
+          // Essayer de vérifier le token avec l'API
+          try {
+            const isValid = await AuthAPI.verifyToken(token);
+            if (isValid) {
+              console.log('Token valide, utilisateur authentifié');
+              // Ici, vous pourriez faire un appel pour récupérer les données de l'utilisateur
+              setUser({
+                id: 1, // Valeur par défaut
+                name: 'Utilisateur',
+                email: 'user@example.com',
+                role: 'user',
+                emailVerified: true
+              });
+              setIsAuthenticated(true);
+            } else {
+              console.log('Token invalide, suppression du token');
+              localStorage.removeItem('token');
+            }
+          } catch (apiError) {
+            console.error('Erreur API lors de la vérification du token:', apiError);
+            // Si l'API n'est pas disponible, on peut quand même essayer d'utiliser le token
+            // pour une meilleure expérience utilisateur
+            console.log('Activation du mode dégradé (API non disponible)');
+            setUser({
+              id: 1,
+              name: 'Utilisateur',
+              email: 'user@example.com',
+              role: 'user',
+              emailVerified: true
+            });
             setIsAuthenticated(true);
-          } else {
-            localStorage.removeItem('token');
           }
         } catch (error) {
-          console.error('Error verifying token:', error);
+          console.error('Erreur générale lors de la vérification du token:', error);
           localStorage.removeItem('token');
         }
+      } else {
+        console.log('Aucun token trouvé, utilisateur non authentifié');
       }
       setLoading(false);
     };
@@ -83,6 +128,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   // Fonction de connexion temporaire pour démonstration
   const loginDemo = () => {
+    console.log('Activation du mode démo');
     const demoUser = {
       id: 1,
       name: 'Utilisateur Démo',
@@ -93,6 +139,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(demoUser);
     setIsAuthenticated(true);
     localStorage.setItem('token', 'demo-token-for-testing');
+
+    // Forcer un délai pour s'assurer que l'état est mis à jour
+    setTimeout(() => {
+      console.log('Mode démo activé, isAuthenticated:', true);
+    }, 100);
   };
 
   return (

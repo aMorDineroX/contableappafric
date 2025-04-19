@@ -6,11 +6,12 @@ import Layout from './components/Layout';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
+import ReactLandingPage from './pages/ReactLandingPage';
+import Clients from './pages/Clients';
 
 // Pages fictives pour la navigation
 import TransactionsPage from './pages/TransactionsPage';
 const Reports = () => <div className="p-8"><h1 className="text-3xl font-bold mb-4">Rapports</h1><p>Cette page est en cours de développement.</p></div>;
-const Clients = () => <div className="p-8"><h1 className="text-3xl font-bold mb-4">Clients</h1><p>Cette page est en cours de développement.</p></div>;
 const Suppliers = () => <div className="p-8"><h1 className="text-3xl font-bold mb-4">Fournisseurs</h1><p>Cette page est en cours de développement.</p></div>;
 const Settings = () => <div className="p-8"><h1 className="text-3xl font-bold mb-4">Paramètres</h1><p>Cette page est en cours de développement.</p></div>;
 const Profile = () => <div className="p-8"><h1 className="text-3xl font-bold mb-4">Profil</h1><p>Cette page est en cours de développement.</p></div>;
@@ -22,8 +23,8 @@ const AnimatedRoutes = () => {
   return (
     <Routes location={location} key={location.pathname}>
 
-          {/* Route racine redirige vers le tableau de bord */}
-          <Route path="/" element={<Navigate to="/dashboard" />} />
+          {/* Route racine affiche la landing page */}
+          <Route path="/" element={<ReactLandingPage />} />
 
           {/* Routes publiques */}
           <Route path="/login" element={

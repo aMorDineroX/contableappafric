@@ -33,13 +33,31 @@ app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
 app.use(requestLogger);
 
 // Connexion BD avec gestion d'erreur
-const pool = new Pool({
-  user: process.env.DB_USER || 'admin',
-  host: process.env.DB_HOST || 'db',
-  database: process.env.DB_NAME || 'contafricax',
-  password: process.env.DB_PASSWORD || 'password',
-  port: 5432,
-});
+let pool: Pool;
+
+if (process.env.DATABASE_URL) {
+  // Utiliser la chaîne de connexion directement si disponible
+  pool = new Pool({
+    connectionString: process.env.DATABASE_URL,
+    ssl: process.env.DB_SSL === 'true' ? {
+      rejectUnauthorized: false // Nécessaire pour les connexions SSL à Neon
+    } : undefined
+  });
+  console.log('Utilisation de la chaîne de connexion DATABASE_URL pour la base de données');
+} else {
+  // Configuration manuelle en fallback
+  pool = new Pool({
+    user: process.env.DB_USER || 'admin',
+    host: process.env.DB_HOST || 'db',
+    database: process.env.DB_NAME || 'contafricax',
+    password: process.env.DB_PASSWORD || 'password',
+    port: parseInt(process.env.DB_PORT || '5432'),
+    ssl: process.env.DB_SSL === 'true' ? {
+      rejectUnauthorized: false
+    } : undefined
+  });
+  console.log('Utilisation des paramètres individuels pour la connexion à la base de données');
+}
 
 // Vérifier la connexion à la base de données
 pool.query('SELECT NOW()', (err, result) => {
@@ -137,7 +155,7 @@ app.post('/api/auth/register', async (req: Request, res: Response) => {
       detail: error.detail,
       code: error.code
     });
-    
+
     return res.status(500).json({
       error: {
         message: 'Erreur serveur lors de l\'inscription',

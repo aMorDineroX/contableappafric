@@ -6,16 +6,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="Content-Security-Policy" content="
       default-src 'self';
-      style-src 'self' 'unsafe-inline';
+      style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com;
       script-src 'self' 'unsafe-eval' 'unsafe-inline';
       connect-src 'self' ws: http://localhost:* data:;
-      font-src 'self' data: https://fonts.gstatic.com;
-      img-src 'self' data: https:;
+      font-src 'self' data: https://fonts.gstatic.com https://cdnjs.cloudflare.com;
+      img-src 'self' data: https: blob: https://randomuser.me https://images.unsplash.com;
       media-src 'self' data: blob:;
       worker-src 'self' blob:;
       frame-src 'self';">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <title>ContAfricaX</title>
   </head>
   <body>

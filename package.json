@@ -7,7 +7,8 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "server": "NODE_ENV=development ts-node-dev --project tsconfig.server.json src/server/index.ts"
+    "server": "cross-env NODE_ENV=development ts-node-dev --project tsconfig.server.json src/server/index.ts",
+    "server-win": "set NODE_ENV=development && ts-node-dev --project tsconfig.server.json src/server/index.ts"
   },
   "dependencies": {
     "@types/bcrypt": "^5.0.0",

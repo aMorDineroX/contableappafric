@@ -1,16 +1,17 @@
 import { Transaction } from './transaction';
 
-export type ClientStatus = 'actif' | 'inactif' | 'prospect' | 'archivé';
+export type SupplierStatus = 'actif' | 'inactif' | 'archivé';
 
-export interface ClientFilters {
-  status: 'all' | ClientStatus;
+export interface SupplierFilters {
+  status: 'all' | SupplierStatus;
   country: string;
-  hasOutstandingBalance: 'all' | boolean;
-  sortBy: 'name' | 'lastOrderDate' | 'totalSales' | 'outstandingBalance';
+  category: string;
+  hasOutstandingPayable: 'all' | boolean;
+  sortBy: 'name' | 'lastOrderDate' | 'totalPurchases' | 'outstandingPayable';
   sortOrder: 'asc' | 'desc';
 }
 
-export interface ClientFormData {
+export interface SupplierFormData {
   name: string;
   email: string;
   phone: string;
@@ -20,11 +21,12 @@ export interface ClientFormData {
   country: string;
   taxId?: string;
   website?: string;
-  status: ClientStatus;
+  category: string;
+  status: SupplierStatus;
   notes?: string;
 }
 
-export interface ClientContact {
+export interface SupplierContact {
   id: number;
   name: string;
   role: string;
@@ -33,7 +35,7 @@ export interface ClientContact {
   isPrimary: boolean;
 }
 
-export interface ClientDocument {
+export interface SupplierDocument {
   id: number;
   name: string;
   type: string;
@@ -42,14 +44,14 @@ export interface ClientDocument {
   uploadDate: string;
 }
 
-export interface ClientNote {
+export interface SupplierNote {
   id: number;
   content: string;
   createdAt: string;
   createdBy: string;
 }
 
-export interface Client {
+export interface Supplier {
   id: number;
   name: string;
   email: string;
@@ -60,14 +62,15 @@ export interface Client {
   country: string;
   taxId?: string;
   website?: string;
-  totalSales: number;
-  outstandingBalance: number;
-  status: ClientStatus;
+  category: string;
+  totalPurchases: number;
+  outstandingPayable: number;
+  status: SupplierStatus;
   lastOrderDate: string;
   createdAt: string;
   updatedAt: string;
-  contacts?: ClientContact[];
-  notes?: ClientNote[];
-  documents?: ClientDocument[];
+  contacts?: SupplierContact[];
+  notes?: SupplierNote[];
+  documents?: SupplierDocument[];
   transactions?: Transaction[];
 }

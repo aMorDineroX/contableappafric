@@ -1,15 +1,52 @@
 import { useState, useEffect, useCallback } from 'react';
 import { formatCurrency } from '../utils/currencies';
 import { useCurrency } from '../contexts/CurrencyContext';
-import { Client, ClientFormData, ClientFilters as ClientFiltersType } from '../types/client';
+import { Client, ClientFormData, ClientFilters, ClientStatus } from '../types/client';
 import { ClientAPI } from '../services/clientApi';
 
 // Import des composants clients
 import ClientTable from '../components/clients/ClientTable';
 import ClientCards from '../components/clients/ClientCards';
-import ClientFilters from '../components/clients/ClientFilters';
 import ClientForm from '../components/clients/ClientForm';
 import ClientDetails from '../components/clients/ClientDetails';
+import ClientBatchActions from '../components/clients/ClientBatchActions';
+
+// Import des icônes SVG en ligne
+const DownloadIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+  </svg>
+);
+
+const FilterIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+  </svg>
+);
+
+const GridIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+  </svg>
+);
+
+const TableIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+  </svg>
+);
+
+const PlusIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+  </svg>
+);
+
+const UserGroupIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+  </svg>
+);
 
 const Clients = () => {
   // Utiliser le contexte de devise global
@@ -29,7 +66,8 @@ const Clients = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<'cards' | 'table'>('cards');
-  const [filters, setFilters] = useState<ClientFiltersType>({
+  const [activeTab, setActiveTab] = useState('all');
+  const [filters, setFilters] = useState<ClientFilters>({
     status: 'all',
     country: '',
     hasOutstandingBalance: 'all',
@@ -37,6 +75,10 @@ const Clients = () => {
     sortOrder: 'asc'
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // États pour la sélection et les opérations par lot
+  const [selectionMode, setSelectionMode] = useState(false);
+  const [selectedClientIds, setSelectedClientIds] = useState<number[]>([]);
 
   // Charger les clients depuis l'API
   const fetchClients = useCallback(async () => {
@@ -57,6 +99,63 @@ const Clients = () => {
   useEffect(() => {
     fetchClients();
   }, [fetchClients]);
+
+  // Gérer la sélection d'un onglet
+  const handleTabChange = (tab: string) => {
+    setActiveTab(tab);
+
+    // Appliquer les filtres en fonction de l'onglet sélectionné
+    if (tab === 'active') {
+      setFilters({...filters, status: 'actif'});
+    } else if (tab === 'inactive') {
+      setFilters({...filters, status: 'inactif'});
+    } else if (tab === 'outstanding') {
+      setFilters({...filters, hasOutstandingBalance: true});
+    } else if (tab === 'recent') {
+      setFilters({...filters, sortBy: 'lastOrderDate', sortOrder: 'desc'});
+    } else {
+      setFilters({
+        status: 'all',
+        country: '',
+        hasOutstandingBalance: 'all',
+        sortBy: 'name',
+        sortOrder: 'asc'
+      });
+    }
+
+    setCurrentPage(1);
+  };
+
+  // Exporter les clients en CSV
+  const exportClientsToCSV = () => {
+    // Entêtes CSV
+    let csvContent = "data:text/csv;charset=utf-8,";
+    csvContent += "Nom,Email,Téléphone,Pays,Status,Total des ventes,Solde impayé,Date de dernière commande\n";
+
+    // Ajouter les données
+    filteredClients.forEach(client => {
+      const row = [
+        client.name,
+        client.email,
+        client.phone,
+        client.country,
+        client.status,
+        formatCurrency(client.totalSales, currency),
+        formatCurrency(client.outstandingBalance, currency),
+        new Date(client.lastOrderDate).toLocaleDateString()
+      ].join(",");
+      csvContent += row + "\n";
+    });
+
+    // Créer le lien de téléchargement
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", "clients_contafricax.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
 
   // Filtrer les clients
   const filteredClients = clients.filter(client => {
@@ -96,60 +195,69 @@ const Clients = () => {
     return 0;
   });
 
+  // Statistiques clients
+  const clientStats = {
+    totalClients: clients.length,
+    activeClients: clients.filter(c => c.status === 'actif').length,
+    inactiveClients: clients.filter(c => c.status === 'inactif').length,
+    totalSales: clients.reduce((sum, client) => sum + client.totalSales, 0),
+    totalOutstanding: clients.reduce((sum, client) => sum + client.outstandingBalance, 0),
+  };
+
   // Pagination
   const totalPages = Math.ceil(filteredClients.length / itemsPerPage);
-  const paginatedClients = filteredClients.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
+  const paginatedClients = filteredClients.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
-  // Calculer les statistiques
-  const totalClients = clients.length;
-  const activeClients = clients.filter(c => c.status === 'actif').length;
-  const totalOutstanding = clients.reduce((sum, c) => sum + c.outstandingBalance, 0);
-  const totalSales = clients.reduce((sum, c) => sum + c.totalSales, 0);
-
-  // Ouvrir le modal avec les détails du client
-  const openClientDetails = (client: Client) => {
+  // Gérer le clic sur un client
+  const handleClientClick = (client: Client) => {
     setSelectedClient(client);
     setIsModalOpen(true);
   };
 
-  // Ouvrir le formulaire pour créer un nouveau client
-  const openNewClientForm = () => {
-    setSelectedClient(null);
-    setIsEditMode(false);
+  // Ouvrir le formulaire d'édition
+  const openClientForm = (client?: Client) => {
+    if (client) {
+      setSelectedClient(client);
+      setIsEditMode(true);
+    } else {
+      setSelectedClient(null);
+      setIsEditMode(false);
+    }
     setIsFormModalOpen(true);
   };
 
-  // Ouvrir le formulaire pour éditer un client existant
-  const openEditClientForm = (client: Client) => {
-    setSelectedClient(client);
-    setIsEditMode(true);
-    setIsFormModalOpen(true);
-    setIsModalOpen(false);
-  };
-
-  // Gérer la soumission du formulaire
-  const handleFormSubmit = async (formData: ClientFormData) => {
+  // Gérer la création ou mise à jour d'un client
+  const handleSaveClient = async (formData: ClientFormData) => {
     setIsSubmitting(true);
     try {
+      let updatedClient: Client;
+
       if (isEditMode && selectedClient) {
-        await ClientAPI.update(selectedClient.id, formData);
+        // Mise à jour
+        updatedClient = await ClientAPI.update(selectedClient.id, formData);
+
+        // Mettre à jour le state local
+        setClients(clients.map(c => c.id === updatedClient.id ? updatedClient : c));
       } else {
-        await ClientAPI.create(formData);
+        // Création
+        updatedClient = await ClientAPI.create(formData);
+
+        // Ajouter au state local
+        setClients([...clients, updatedClient]);
       }
-      fetchClients();
+
       setIsFormModalOpen(false);
+      setIsEditMode(false);
+      setSelectedClient(null);
     } catch (err) {
-      setError(`Erreur lors de l'${isEditMode ? 'édition' : 'ajout'} du client. Veuillez réessayer.`);
-      console.error(`Erreur lors de l'${isEditMode ? 'édition' : 'ajout'} du client:`, err);
+      setError('Erreur lors de l\'enregistrement du client.');
+      console.error('Erreur lors de l\'enregistrement du client:', err);
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  // Gérer la suppression d'un client
+  // Supprimer un client
   const handleDeleteClient = async (clientId: number) => {
     if (!window.confirm('Êtes-vous sûr de vouloir supprimer ce client ?')) {
       return;
@@ -157,276 +265,402 @@ const Clients = () => {
 
     try {
       await ClientAPI.delete(clientId);
-      fetchClients();
+      setClients(clients.filter(c => c.id !== clientId));
       setIsModalOpen(false);
+      setSelectedClient(null);
+
+      // Si le client était sélectionné dans le mode de sélection, le retirer
+      if (selectedClientIds.includes(clientId)) {
+        setSelectedClientIds(selectedClientIds.filter(id => id !== clientId));
+      }
     } catch (err) {
-      setError('Erreur lors de la suppression du client. Veuillez réessayer.');
+      setError('Erreur lors de la suppression du client.');
       console.error('Erreur lors de la suppression du client:', err);
     }
   };
 
-  // Gérer l'ajout d'une note
-  const handleAddNote = async (content: string) => {
-    if (!selectedClient) return;
-
-    try {
-      await ClientAPI.addNote(selectedClient.id, content);
-      // Recharger les détails du client
-      const updatedClient = await ClientAPI.getById(selectedClient.id);
-      setSelectedClient(updatedClient);
-    } catch (err) {
-      setError('Erreur lors de l\'ajout de la note. Veuillez réessayer.');
-      console.error('Erreur lors de l\'ajout de la note:', err);
+  // Gérer la sélection d'un client
+  const handleClientSelection = (clientId: number, isSelected: boolean) => {
+    if (isSelected) {
+      setSelectedClientIds([...selectedClientIds, clientId]);
+    } else {
+      setSelectedClientIds(selectedClientIds.filter(id => id !== clientId));
     }
   };
 
-  // Gérer le changement de filtres
-  const handleFilterChange = (newFilters: ClientFiltersType) => {
-    setFilters(newFilters);
-    setCurrentPage(1); // Réinitialiser la pagination
+  // Supprimer plusieurs clients
+  const handleBatchDelete = async () => {
+    try {
+      // Supprimer chaque client sélectionné
+      for (const clientId of selectedClientIds) {
+        await ClientAPI.delete(clientId);
+      }
+
+      // Mettre à jour la liste des clients
+      setClients(clients.filter(c => !selectedClientIds.includes(c.id)));
+
+      // Réinitialiser la sélection
+      setSelectedClientIds([]);
+      setError(null);
+    } catch (err) {
+      setError('Erreur lors de la suppression des clients sélectionnés.');
+      console.error('Erreur lors de la suppression des clients:', err);
+    }
   };
 
-  // Réinitialiser les filtres
-  const resetFilters = () => {
-    setFilters({
-      status: 'all',
-      country: '',
-      hasOutstandingBalance: 'all',
-      sortBy: 'name',
-      sortOrder: 'asc'
-    });
-    setSearchTerm('');
-    setCurrentPage(1);
+  // Changer le statut de plusieurs clients
+  const handleBatchStatusChange = async (status: ClientStatus) => {
+    try {
+      const updatedClients: Client[] = [];
+
+      // Mettre à jour chaque client sélectionné
+      for (const clientId of selectedClientIds) {
+        const client = clients.find(c => c.id === clientId);
+        if (client) {
+          const updatedClient = await ClientAPI.update(clientId, { status });
+          updatedClients.push(updatedClient);
+        }
+      }
+
+      // Mettre à jour la liste des clients
+      setClients(clients.map(c => {
+        const updated = updatedClients.find(u => u.id === c.id);
+        return updated || c;
+      }));
+
+      // Réinitialiser la sélection
+      setSelectedClientIds([]);
+      setError(null);
+    } catch (err) {
+      setError('Erreur lors de la mise à jour du statut des clients sélectionnés.');
+      console.error('Erreur lors de la mise à jour du statut des clients:', err);
+    }
+  };
+
+  // Activer/désactiver le mode de sélection
+  const toggleSelectionMode = () => {
+    setSelectionMode(!selectionMode);
+    if (selectionMode) {
+      setSelectedClientIds([]);
+    }
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-6">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-3xl font-bold text-gray-900">Clients</h1>
-          <button className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors">
-            Nouveau client
-          </button>
+    <div className="container mx-auto px-4 py-6">
+      {/* En-tête de la page avec statistiques */}
+      <div className="bg-white rounded-xl shadow-md p-6 mb-6">
+        <div className="flex flex-col md:flex-row justify-between items-center mb-6">
+          <h1 className="text-2xl font-bold text-gray-800 mb-4 md:mb-0">Gestion des clients</h1>
+          <div className="flex space-x-2">
+            <button
+              onClick={() => openClientForm()}
+              className="btn-primary px-4 py-2 rounded-lg flex items-center gap-2"
+            >
+              <PlusIcon />
+              Nouveau client
+            </button>
+            <button
+              onClick={exportClientsToCSV}
+              className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg flex items-center gap-2"
+            >
+              <DownloadIcon />
+              Exporter CSV
+            </button>
+            <button
+              onClick={toggleSelectionMode}
+              className={`px-4 py-2 rounded-lg flex items-center gap-2 ${selectionMode
+                ? 'bg-blue-600 text-white hover:bg-blue-700'
+                : 'border border-gray-300 bg-white text-gray-700 hover:bg-gray-100'}`}
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+              </svg>
+              {selectionMode ? 'Annuler la sélection' : 'Sélectionner'}
+            </button>
+          </div>
         </div>
 
-        {/* Cartes de statistiques */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div className="bg-white rounded-lg shadow p-6">
-            <h3 className="text-lg font-medium text-gray-900">Total clients</h3>
-            <p className="text-2xl font-bold text-blue-600">{totalClients}</p>
-            <p className="text-sm text-gray-500">{activeClients} actifs</p>
-          </div>
-          <div className="bg-white rounded-lg shadow p-6">
-            <h3 className="text-lg font-medium text-gray-900">Soldes impayés</h3>
-            <p className="text-2xl font-bold text-amber-600">
-              {formatCurrency(totalOutstanding, currency)}
+        {/* Statistiques */}
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+          <div className="bg-blue-50 p-4 rounded-lg">
+            <p className="text-sm text-blue-600">Total clients</p>
+            <p className="text-2xl font-bold text-blue-800 flex items-center">
+              <UserGroupIcon />
+              <span className="ml-2">{clientStats.totalClients}</span>
             </p>
-            <p className="text-sm text-gray-500">À recouvrer</p>
           </div>
-          <div className="bg-white rounded-lg shadow p-6">
-            <h3 className="text-lg font-medium text-gray-900">Ventes totales</h3>
-            <p className="text-2xl font-bold text-green-600">
-              {formatCurrency(clientsData.reduce((sum, c) => sum + c.totalSales, 0), currency)}
-            </p>
-            <p className="text-sm text-gray-500">Tous clients confondus</p>
+          <div className="bg-green-50 p-4 rounded-lg">
+            <p className="text-sm text-green-600">Clients actifs</p>
+            <p className="text-2xl font-bold text-green-800">{clientStats.activeClients}</p>
+          </div>
+          <div className="bg-yellow-50 p-4 rounded-lg">
+            <p className="text-sm text-yellow-600">Clients inactifs</p>
+            <p className="text-2xl font-bold text-yellow-800">{clientStats.inactiveClients}</p>
+          </div>
+          <div className="bg-purple-50 p-4 rounded-lg">
+            <p className="text-sm text-purple-600">Total des ventes</p>
+            <p className="text-2xl font-bold text-purple-800">{formatCurrency(clientStats.totalSales, currency)}</p>
+          </div>
+          <div className="bg-red-50 p-4 rounded-lg">
+            <p className="text-sm text-red-600">Total impayé</p>
+            <p className="text-2xl font-bold text-red-800">{formatCurrency(clientStats.totalOutstanding, currency)}</p>
           </div>
         </div>
+      </div>
 
-        {/* Barre de recherche */}
-        <div className="bg-white rounded-lg shadow mb-8">
-          <div className="p-6">
+      {/* Onglets et filtres */}
+      <div className="bg-white rounded-xl shadow-md p-6 mb-6">
+        <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
+          {/* Onglets */}
+          <div className="flex space-x-1 bg-gray-100 p-1 rounded-lg">
+            <button
+              onClick={() => handleTabChange('all')}
+              className={`px-4 py-2 rounded-md ${activeTab === 'all'
+                ? 'bg-white shadow-sm font-medium'
+                : 'text-gray-500 hover:bg-gray-200'}`}
+            >
+              Tous
+            </button>
+            <button
+              onClick={() => handleTabChange('active')}
+              className={`px-4 py-2 rounded-md ${activeTab === 'active'
+                ? 'bg-white shadow-sm font-medium'
+                : 'text-gray-500 hover:bg-gray-200'}`}
+            >
+              Actifs
+            </button>
+            <button
+              onClick={() => handleTabChange('inactive')}
+              className={`px-4 py-2 rounded-md ${activeTab === 'inactive'
+                ? 'bg-white shadow-sm font-medium'
+                : 'text-gray-500 hover:bg-gray-200'}`}
+            >
+              Inactifs
+            </button>
+            <button
+              onClick={() => handleTabChange('outstanding')}
+              className={`px-4 py-2 rounded-md ${activeTab === 'outstanding'
+                ? 'bg-white shadow-sm font-medium'
+                : 'text-gray-500 hover:bg-gray-200'}`}
+            >
+              Impayés
+            </button>
+            <button
+              onClick={() => handleTabChange('recent')}
+              className={`px-4 py-2 rounded-md ${activeTab === 'recent'
+                ? 'bg-white shadow-sm font-medium'
+                : 'text-gray-500 hover:bg-gray-200'}`}
+            >
+              Récents
+            </button>
+          </div>
+
+          {/* Options de vue et filtres */}
+          <div className="flex items-center gap-2">
             <div className="relative">
               <input
                 type="text"
-                placeholder="Rechercher un client..."
-                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Rechercher..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
               />
-              <svg
-                className="absolute right-3 top-2.5 h-5 w-5 text-gray-400"
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 20 20"
-                fill="currentColor"
+              <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clipRule="evenodd" />
+                </svg>
+              </div>
+            </div>
+
+            <button
+              onClick={() => alert("Fonctionnalité de filtres avancés à implémenter")}
+              className="p-2 border border-gray-300 rounded-lg hover:bg-gray-100"
+              title="Filtres avancés"
+            >
+              <FilterIcon />
+            </button>
+
+            <div className="flex bg-gray-100 p-1 rounded-lg">
+              <button
+                onClick={() => setViewMode('cards')}
+                className={`p-2 rounded-md ${viewMode === 'cards' ? 'bg-white shadow-sm' : 'text-gray-500'}`}
+                title="Vue en cartes"
               >
-                <path
-                  fillRule="evenodd"
-                  d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
-                  clipRule="evenodd"
-                />
-              </svg>
+                <GridIcon />
+              </button>
+              <button
+                onClick={() => setViewMode('table')}
+                className={`p-2 rounded-md ${viewMode === 'table' ? 'bg-white shadow-sm' : 'text-gray-500'}`}
+                title="Vue en tableau"
+              >
+                <TableIcon />
+              </button>
             </div>
           </div>
         </div>
 
-        {/* Liste des clients */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          {paginatedClients.map((client) => (
-            <div
-              key={client.id}
-              className="bg-white rounded-lg shadow overflow-hidden hover:shadow-md transition-shadow cursor-pointer"
-              onClick={() => openClientDetails(client)}
+        {/* Message d'erreur */}
+        {error && (
+          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg mb-6">
+            <p>{error}</p>
+          </div>
+        )}
+
+        {/* Contenu principal - Liste des clients */}
+        {loading ? (
+          <div className="flex justify-center items-center h-64">
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+          </div>
+        ) : filteredClients.length === 0 ? (
+          <div className="text-center py-10 bg-gray-50 rounded-lg">
+            <p className="text-gray-500 mb-4">Aucun client ne correspond à vos critères de recherche</p>
+            <button
+              onClick={() => {
+                setSearchTerm('');
+                setFilters({
+                  status: 'all',
+                  country: '',
+                  hasOutstandingBalance: 'all',
+                  sortBy: 'name',
+                  sortOrder: 'asc'
+                });
+              }}
+              className="px-4 py-2 bg-gray-200 rounded-lg hover:bg-gray-300"
             >
-              <div className="p-6">
-                <div className="flex justify-between items-start mb-4">
-                  <h3 className="text-lg font-medium text-gray-900 truncate">{client.name}</h3>
-                  <span className={`px-2 py-1 text-xs font-semibold rounded-full ${
-                    client.status === 'actif'
-                      ? 'bg-green-100 text-green-800'
-                      : 'bg-gray-100 text-gray-800'
-                  }`}>
-                    {client.status}
-                  </span>
-                </div>
-                <p className="text-sm text-gray-500 mb-2">{client.email}</p>
-                <p className="text-sm text-gray-500 mb-4">{client.country}</p>
-                <div className="border-t border-gray-200 pt-4">
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-gray-500">Solde impayé</span>
-                    <span className={`font-medium ${
-                      client.outstandingBalance > 0 ? 'text-amber-600' : 'text-green-600'
-                    }`}>
-                      {formatCurrency(client.outstandingBalance, currency)}
-                    </span>
-                  </div>
-                  <div className="flex justify-between items-center mt-2">
-                    <span className="text-sm text-gray-500">Ventes totales</span>
-                    <span className="font-medium text-blue-600">
-                      {formatCurrency(client.totalSales, currency)}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
+              Réinitialiser les filtres
+            </button>
+          </div>
+        ) : viewMode === 'cards' ? (
+          <ClientCards
+            clients={paginatedClients}
+            onClientClick={handleClientClick}
+            selectedClientIds={selectedClientIds}
+            onClientSelect={handleClientSelection}
+            selectionMode={selectionMode}
+          />
+        ) : (
+          <ClientTable
+            clients={paginatedClients}
+            onClientClick={handleClientClick}
+            selectedClientIds={selectedClientIds}
+            onClientSelect={handleClientSelection}
+            selectionMode={selectionMode}
+          />
+        )}
 
         {/* Pagination */}
         {totalPages > 1 && (
-          <div className="flex justify-center mt-8">
-            <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+          <div className="flex justify-center mt-6">
+            <div className="inline-flex rounded-md shadow-sm">
               <button
                 onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
                 disabled={currentPage === 1}
-                className={`relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium ${
-                  currentPage === 1
-                    ? 'text-gray-300 cursor-not-allowed'
-                    : 'text-gray-500 hover:bg-gray-50'
-                }`}
+                className={`px-3 py-1 rounded-l-md border ${currentPage === 1 ? 'bg-gray-100 text-gray-400 cursor-not-allowed' : 'hover:bg-gray-100'}`}
               >
-                <span className="sr-only">Précédent</span>
-                <svg className="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                  <path fillRule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clipRule="evenodd" />
-                </svg>
+                Précédent
               </button>
 
-              {Array.from({ length: totalPages }).map((_, index) => (
-                <button
-                  key={index}
-                  onClick={() => setCurrentPage(index + 1)}
-                  className={`relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium ${
-                    currentPage === index + 1
-                      ? 'z-10 bg-blue-50 border-blue-500 text-blue-600'
-                      : 'text-gray-500 hover:bg-gray-50'
-                  }`}
-                >
-                  {index + 1}
-                </button>
-              ))}
+              {Array.from({ length: Math.min(5, totalPages) }).map((_, index) => {
+                // Affiche au maximum 5 pages à la fois, centrées sur la page actuelle
+                let pageToShow: number;
+                if (totalPages <= 5) {
+                  pageToShow = index + 1;
+                } else if (currentPage <= 3) {
+                  pageToShow = index + 1;
+                } else if (currentPage >= totalPages - 2) {
+                  pageToShow = totalPages - 4 + index;
+                } else {
+                  pageToShow = currentPage - 2 + index;
+                }
+
+                return (
+                  <button
+                    key={index}
+                    onClick={() => setCurrentPage(pageToShow)}
+                    className={`px-3 py-1 border-t border-b ${currentPage === pageToShow ? 'bg-blue-500 text-white' : 'hover:bg-gray-100'}`}
+                  >
+                    {pageToShow}
+                  </button>
+                );
+              })}
 
               <button
                 onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
                 disabled={currentPage === totalPages}
-                className={`relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium ${
-                  currentPage === totalPages
-                    ? 'text-gray-300 cursor-not-allowed'
-                    : 'text-gray-500 hover:bg-gray-50'
-                }`}
+                className={`px-3 py-1 rounded-r-md border ${currentPage === totalPages ? 'bg-gray-100 text-gray-400 cursor-not-allowed' : 'hover:bg-gray-100'}`}
               >
-                <span className="sr-only">Suivant</span>
-                <svg className="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                  <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
-                </svg>
+                Suivant
               </button>
-            </nav>
-          </div>
-        )}
-
-        {/* Modal de détails du client */}
-        {isModalOpen && selectedClient && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
-              <div className="p-6">
-                <div className="flex justify-between items-start mb-6">
-                  <h2 className="text-2xl font-bold text-gray-900">{selectedClient.name}</h2>
-                  <button
-                    onClick={() => setIsModalOpen(false)}
-                    className="text-gray-400 hover:text-gray-500"
-                  >
-                    <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                  </button>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                  <div>
-                    <h3 className="text-lg font-medium text-gray-900 mb-4">Informations de contact</h3>
-                    <p className="text-sm text-gray-500 mb-2">
-                      <span className="font-medium">Email:</span> {selectedClient.email}
-                    </p>
-                    <p className="text-sm text-gray-500 mb-2">
-                      <span className="font-medium">Téléphone:</span> {selectedClient.phone}
-                    </p>
-                    <p className="text-sm text-gray-500 mb-2">
-                      <span className="font-medium">Adresse:</span> {selectedClient.address}
-                    </p>
-                    <p className="text-sm text-gray-500 mb-2">
-                      <span className="font-medium">Pays:</span> {selectedClient.country}
-                    </p>
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-medium text-gray-900 mb-4">Informations financières</h3>
-                    <p className="text-sm text-gray-500 mb-2">
-                      <span className="font-medium">Ventes totales:</span>{' '}
-                      <span className="text-blue-600">{formatCurrency(selectedClient.totalSales, currency)}</span>
-                    </p>
-                    <p className="text-sm text-gray-500 mb-2">
-                      <span className="font-medium">Solde impayé:</span>{' '}
-                      <span className={selectedClient.outstandingBalance > 0 ? 'text-amber-600' : 'text-green-600'}>
-                        {formatCurrency(selectedClient.outstandingBalance, currency)}
-                      </span>
-                    </p>
-                    <p className="text-sm text-gray-500 mb-2">
-                      <span className="font-medium">Statut:</span>{' '}
-                      <span className={`px-2 py-1 text-xs font-semibold rounded-full ${
-                        selectedClient.status === 'actif'
-                          ? 'bg-green-100 text-green-800'
-                          : 'bg-gray-100 text-gray-800'
-                      }`}>
-                        {selectedClient.status}
-                      </span>
-                    </p>
-                    <p className="text-sm text-gray-500 mb-2">
-                      <span className="font-medium">Dernière commande:</span>{' '}
-                      {new Date(selectedClient.lastOrderDate).toLocaleDateString('fr-FR')}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="border-t border-gray-200 pt-6 flex justify-end space-x-4">
-                  <button className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50">
-                    Voir les factures
-                  </button>
-                  <button className="px-4 py-2 bg-blue-600 border border-transparent rounded-md text-sm font-medium text-white hover:bg-blue-700">
-                    Modifier
-                  </button>
-                </div>
-              </div>
             </div>
           </div>
         )}
       </div>
+
+      {/* Modal de détail client - utilisation du composant existant */}
+      {isModalOpen && selectedClient && (
+        <ClientDetails
+          client={selectedClient}
+          onEdit={() => {
+            setIsModalOpen(false);
+            openClientForm(selectedClient);
+          }}
+          onClose={() => setIsModalOpen(false)}
+          onDelete={handleDeleteClient}
+          onAddNote={async (content: string) => {
+            if (selectedClient) {
+              try {
+                const newNote = await ClientAPI.addNote(selectedClient.id, content);
+                // Mettre à jour le client sélectionné avec la nouvelle note
+                const updatedClient = {
+                  ...selectedClient,
+                  notes: [...(selectedClient.notes || []), newNote]
+                };
+                setSelectedClient(updatedClient);
+
+                // Mettre à jour la liste des clients
+                setClients(clients.map(c => c.id === selectedClient.id ? updatedClient : c));
+                return Promise.resolve();
+              } catch (err) {
+                console.error('Erreur lors de l\'ajout de la note:', err);
+                return Promise.reject(err);
+              }
+            }
+            return Promise.reject('Aucun client sélectionné');
+          }}
+        />
+      )}
+
+      {/* Modal de formulaire client - utilisation du composant existant */}
+      {isFormModalOpen && (
+        <ClientForm
+          initialData={isEditMode && selectedClient ? {
+            name: selectedClient.name,
+            email: selectedClient.email,
+            phone: selectedClient.phone,
+            address: selectedClient.address,
+            city: selectedClient.city,
+            postalCode: selectedClient.postalCode,
+            country: selectedClient.country,
+            taxId: selectedClient.taxId,
+            website: selectedClient.website,
+            status: selectedClient.status,
+            notes: selectedClient.notes?.map(n => n.content).join('\n')
+          } : undefined}
+          isSubmitting={isSubmitting}
+          onSubmit={handleSaveClient}
+          onCancel={() => setIsFormModalOpen(false)}
+        />
+      )}
+
+      {/* Actions par lot */}
+      {selectionMode && (
+        <ClientBatchActions
+          selectedCount={selectedClientIds.length}
+          onBatchDelete={handleBatchDelete}
+          onBatchStatusChange={handleBatchStatusChange}
+          onClearSelection={() => setSelectedClientIds([])}
+        />
+      )}
     </div>
   );
 };

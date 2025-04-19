@@ -8,13 +8,15 @@ interface ClientDetailsProps {
   onEdit: () => void;
   onClose: () => void;
   onAddNote?: (content: string) => Promise<void>;
+  onDelete?: (clientId: number) => Promise<void>;
 }
 
 const ClientDetails: React.FC<ClientDetailsProps> = ({
   client,
   onEdit,
   onClose,
-  onAddNote
+  onAddNote,
+  onDelete
 }) => {
   const { currency } = useCurrency();
   const [activeTab, setActiveTab] = useState<'info' | 'transactions' | 'notes' | 'documents'>('info');
@@ -31,7 +33,7 @@ const ClientDetails: React.FC<ClientDetailsProps> = ({
 
   const handleAddNote = async () => {
     if (!newNote.trim() || !onAddNote) return;
-    
+
     setIsAddingNote(true);
     try {
       await onAddNote(newNote);
@@ -52,8 +54,8 @@ const ClientDetails: React.FC<ClientDetailsProps> = ({
             <div className="flex items-center">
               <h2 className="text-2xl font-bold text-gray-900">{client.name}</h2>
               <span className={`ml-3 px-2 py-1 text-xs font-semibold rounded-full ${
-                client.status === 'actif' 
-                  ? 'bg-green-100 text-green-800' 
+                client.status === 'actif'
+                  ? 'bg-green-100 text-green-800'
                   : client.status === 'prospect'
                   ? 'bg-blue-100 text-blue-800'
                   : client.status === 'inactif'
@@ -78,6 +80,21 @@ const ClientDetails: React.FC<ClientDetailsProps> = ({
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
               </svg>
             </button>
+            {onDelete && (
+              <button
+                onClick={() => {
+                  if (window.confirm('Êtes-vous sûr de vouloir supprimer ce client ?')) {
+                    onDelete(client.id);
+                  }
+                }}
+                className="p-2 text-red-600 hover:text-red-800 rounded-full hover:bg-red-100"
+                title="Supprimer"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                </svg>
+              </button>
+            )}
             <button
               onClick={onClose}
               className="p-2 text-gray-600 hover:text-gray-800 rounded-full hover:bg-gray-100"
@@ -89,7 +106,7 @@ const ClientDetails: React.FC<ClientDetailsProps> = ({
             </button>
           </div>
         </div>
-        
+
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
           <div className="bg-white rounded-md p-4 shadow-sm">
             <p className="text-sm text-gray-500">Ventes totales</p>
@@ -111,7 +128,7 @@ const ClientDetails: React.FC<ClientDetailsProps> = ({
           </div>
         </div>
       </div>
-      
+
       {/* Onglets */}
       <div className="border-b border-gray-200">
         <nav className="flex -mb-px">
@@ -167,7 +184,7 @@ const ClientDetails: React.FC<ClientDetailsProps> = ({
           </button>
         </nav>
       </div>
-      
+
       {/* Contenu des onglets */}
       <div className="p-6">
         {activeTab === 'info' && (
@@ -191,9 +208,9 @@ const ClientDetails: React.FC<ClientDetailsProps> = ({
                   <p className="text-sm text-gray-500">Site web</p>
                   <p className="text-base font-medium text-gray-900">
                     {client.website ? (
-                      <a 
-                        href={client.website.startsWith('http') ? client.website : `https://${client.website}`} 
-                        target="_blank" 
+                      <a
+                        href={client.website.startsWith('http') ? client.website : `https://${client.website}`}
+                        target="_blank"
                         rel="noopener noreferrer"
                         className="text-blue-600 hover:text-blue-800"
                       >
@@ -214,8 +231,8 @@ const ClientDetails: React.FC<ClientDetailsProps> = ({
                   <p className="text-sm text-gray-500">Statut</p>
                   <p className="text-base font-medium">
                     <span className={`px-2 py-1 text-xs font-semibold rounded-full ${
-                      client.status === 'actif' 
-                        ? 'bg-green-100 text-green-800' 
+                      client.status === 'actif'
+                        ? 'bg-green-100 text-green-800'
                         : client.status === 'prospect'
                         ? 'bg-blue-100 text-blue-800'
                         : client.status === 'inactif'
@@ -228,7 +245,7 @@ const ClientDetails: React.FC<ClientDetailsProps> = ({
                 </div>
               </div>
             </div>
-            
+
             <div>
               <h3 className="text-lg font-medium text-gray-900 mb-4">Adresse</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -243,7 +260,7 @@ const ClientDetails: React.FC<ClientDetailsProps> = ({
                 </div>
               </div>
             </div>
-            
+
             {client.contacts && client.contacts.length > 0 && (
               <div>
                 <h3 className="text-lg font-medium text-gray-900 mb-4">Contacts</h3>
@@ -280,7 +297,7 @@ const ClientDetails: React.FC<ClientDetailsProps> = ({
                 </div>
               </div>
             )}
-            
+
             <div className="border-t pt-4 mt-4">
               <div className="flex justify-between text-xs text-gray-500">
                 <span>Client depuis {formatDate(client.createdAt)}</span>
@@ -289,7 +306,7 @@ const ClientDetails: React.FC<ClientDetailsProps> = ({
             </div>
           </div>
         )}
-        
+
         {activeTab === 'transactions' && (
           <div>
             {client.transactions && client.transactions.length > 0 ? (
@@ -340,14 +357,14 @@ const ClientDetails: React.FC<ClientDetailsProps> = ({
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm">
                             <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                              transaction.status === 'VALIDEE' 
-                                ? 'bg-green-100 text-green-800' 
+                              transaction.status === 'VALIDEE'
+                                ? 'bg-green-100 text-green-800'
                                 : transaction.status === 'EN_ATTENTE'
                                 ? 'bg-yellow-100 text-yellow-800'
                                 : 'bg-red-100 text-red-800'
                             }`}>
-                              {transaction.status === 'VALIDEE' 
-                                ? 'Validée' 
+                              {transaction.status === 'VALIDEE'
+                                ? 'Validée'
                                 : transaction.status === 'EN_ATTENTE'
                                 ? 'En attente'
                                 : 'Annulée'
@@ -362,18 +379,18 @@ const ClientDetails: React.FC<ClientDetailsProps> = ({
               </div>
             ) : (
               <div className="text-center py-12">
-                <svg 
-                  xmlns="http://www.w3.org/2000/svg" 
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
                   className="mx-auto h-12 w-12 text-gray-400"
-                  fill="none" 
-                  viewBox="0 0 24 24" 
+                  fill="none"
+                  viewBox="0 0 24 24"
                   stroke="currentColor"
                 >
-                  <path 
-                    strokeLinecap="round" 
-                    strokeLinejoin="round" 
-                    strokeWidth={2} 
-                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" 
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
                   />
                 </svg>
                 <h3 className="mt-2 text-sm font-medium text-gray-900">Aucune transaction</h3>
@@ -394,13 +411,13 @@ const ClientDetails: React.FC<ClientDetailsProps> = ({
             )}
           </div>
         )}
-        
+
         {activeTab === 'notes' && (
           <div>
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-lg font-medium text-gray-900">Notes</h3>
             </div>
-            
+
             <div className="mb-6">
               <textarea
                 value={newNote}
@@ -421,7 +438,7 @@ const ClientDetails: React.FC<ClientDetailsProps> = ({
                 </button>
               </div>
             </div>
-            
+
             {client.notes && client.notes.length > 0 ? (
               <div className="space-y-4">
                 {client.notes.map((note: ClientNote) => (
@@ -436,18 +453,18 @@ const ClientDetails: React.FC<ClientDetailsProps> = ({
               </div>
             ) : (
               <div className="text-center py-12">
-                <svg 
-                  xmlns="http://www.w3.org/2000/svg" 
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
                   className="mx-auto h-12 w-12 text-gray-400"
-                  fill="none" 
-                  viewBox="0 0 24 24" 
+                  fill="none"
+                  viewBox="0 0 24 24"
                   stroke="currentColor"
                 >
-                  <path 
-                    strokeLinecap="round" 
-                    strokeLinejoin="round" 
-                    strokeWidth={2} 
-                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" 
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
                   />
                 </svg>
                 <h3 className="mt-2 text-sm font-medium text-gray-900">Aucune note</h3>
@@ -458,7 +475,7 @@ const ClientDetails: React.FC<ClientDetailsProps> = ({
             )}
           </div>
         )}
-        
+
         {activeTab === 'documents' && (
           <div>
             <div className="flex justify-between items-center mb-4">
@@ -467,24 +484,24 @@ const ClientDetails: React.FC<ClientDetailsProps> = ({
                 Ajouter un document
               </button>
             </div>
-            
+
             {client.documents && client.documents.length > 0 ? (
               <ul className="divide-y divide-gray-200">
                 {client.documents.map(doc => (
                   <li key={doc.id} className="py-4 flex items-center justify-between">
                     <div className="flex items-center">
-                      <svg 
-                        xmlns="http://www.w3.org/2000/svg" 
-                        className="flex-shrink-0 h-5 w-5 text-gray-400" 
-                        fill="none" 
-                        viewBox="0 0 24 24" 
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="flex-shrink-0 h-5 w-5 text-gray-400"
+                        fill="none"
+                        viewBox="0 0 24 24"
                         stroke="currentColor"
                       >
-                        <path 
-                          strokeLinecap="round" 
-                          strokeLinejoin="round" 
-                          strokeWidth={2} 
-                          d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" 
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
                         />
                       </svg>
                       <div className="ml-3">
@@ -507,18 +524,18 @@ const ClientDetails: React.FC<ClientDetailsProps> = ({
               </ul>
             ) : (
               <div className="text-center py-12">
-                <svg 
-                  xmlns="http://www.w3.org/2000/svg" 
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
                   className="mx-auto h-12 w-12 text-gray-400"
-                  fill="none" 
-                  viewBox="0 0 24 24" 
+                  fill="none"
+                  viewBox="0 0 24 24"
                   stroke="currentColor"
                 >
-                  <path 
-                    strokeLinecap="round" 
-                    strokeLinejoin="round" 
-                    strokeWidth={2} 
-                    d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z" 
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z"
                   />
                 </svg>
                 <h3 className="mt-2 text-sm font-medium text-gray-900">Aucun document</h3>

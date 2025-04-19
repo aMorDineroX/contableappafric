@@ -46,6 +46,12 @@ const Navbar = () => {
                 Clients
               </Link>
               <Link
+                to="/suppliers"
+                className={`${location.pathname === '/suppliers' ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:border-blue-300 hover:text-blue-700'} inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium`}
+              >
+                Fournisseurs
+              </Link>
+              <Link
                 to="/reports"
                 className={`${location.pathname === '/reports' ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:border-blue-300 hover:text-blue-700'} inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium`}
               >
@@ -187,6 +193,13 @@ const Navbar = () => {
             onClick={() => setIsMobileMenuOpen(false)}
           >
             Clients
+          </Link>
+          <Link
+            to="/suppliers"
+            className={`${location.pathname === '/suppliers' ? 'bg-blue-50 border-blue-500 text-blue-700' : 'border-transparent text-gray-500 hover:bg-gray-50 hover:border-blue-300 hover:text-blue-700'} block pl-3 pr-4 py-2 border-l-4 text-base font-medium`}
+            onClick={() => setIsMobileMenuOpen(false)}
+          >
+            Fournisseurs
           </Link>
           <Link
             to="/reports"
