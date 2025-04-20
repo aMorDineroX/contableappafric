@@ -1,11 +1,5 @@
-# Ignore server-side code during Vercel deployment
 src/controllers/
 src/server/
-
-# Ignore TypeScript configuration files
 tsconfig.json
 tsconfig.node.json
 tsconfig.server.json
-
-# Ignore build scripts
-build-vercel.js

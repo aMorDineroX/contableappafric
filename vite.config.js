@@ -1,9 +1,9 @@
-const { defineConfig } = require('vite');
-const react = require('@vitejs/plugin-react').default;
-const path = require('path');
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+import path from 'path'
 
 // https://vitejs.dev/config/
-module.exports = defineConfig({
+export default defineConfig({
   plugins: [react()],
   resolve: {
     alias: {
@@ -11,25 +11,16 @@ module.exports = defineConfig({
     },
   },
   build: {
-    // Ignorer les erreurs pendant le build
-    commonjsOptions: {
-      transformMixedEsModules: true,
-    },
-    rollupOptions: {
-      onwarn(warning, warn) {
-        // Ignorer tous les avertissements
-        return;
-      }
-    }
+    outDir: 'dist',
+    emptyOutDir: true,
+    sourcemap: false,
+    minify: true,
+    target: 'es2015',
   },
   esbuild: {
-    // Ignorer toutes les erreurs TypeScript
-    legalComments: 'none',
+    jsxInject: `import React from 'react'`,
     logOverride: {
       'this-is-undefined-in-esm': 'silent',
-      'unsupported-jsx-comment': 'silent',
-      'parse-error': 'silent',
-      'duplicate-import': 'silent',
     },
   }
 })

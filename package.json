@@ -5,7 +5,7 @@
   "type": "commonjs",
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build",
+    "build": "vite build --config vite.config.cjs",
     "build:vercel": "vite build --config vite.config.js",
     "build:vercel:old": "node build-vercel.js",
     "preview": "vite preview",

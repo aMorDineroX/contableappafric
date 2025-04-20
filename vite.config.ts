@@ -22,5 +22,18 @@ export default defineConfig({
     alias: {
       '@': path.resolve(__dirname, 'src')
     }
+  },
+  build: {
+    outDir: 'dist',
+    emptyOutDir: true,
+    sourcemap: false,
+    minify: true,
+    target: 'es2015',
+  },
+  esbuild: {
+    jsxInject: `import React from 'react'`,
+    logOverride: {
+      'this-is-undefined-in-esm': 'silent',
+    },
   }
 })

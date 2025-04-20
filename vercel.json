@@ -1,8 +1,4 @@
 {
-  "buildCommand": "bash vercel-build.sh",
-  "outputDirectory": "dist",
-  "framework": "vite",
-  "installCommand": "npm install",
   "rewrites": [
     { "source": "/(.*)", "destination": "/" }
   ],
@@ -15,13 +11,5 @@
         { "key": "X-XSS-Protection", "value": "1; mode=block" }
       ]
     }
-  ],
-  "env": {
-    "CI": "false",
-    "SKIP_PREFLIGHT_CHECK": "true",
-    "TSC_COMPILE_ON_ERROR": "true",
-    "VITE_SKIP_TS_CHECK": "true",
-    "NODE_OPTIONS": "--max-old-space-size=4096"
-  },
-  "ignoreCommand": "echo 'Skipping TypeScript checks'"
+  ]
 }
