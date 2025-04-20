@@ -40,6 +40,7 @@ ContAfricaX est une application moderne de comptabilité conçue spécifiquement
 ### DevOps
 - **Conteneurisation**: Docker et Docker Compose
 - **CI/CD**: GitHub Actions
+- **Déploiement**: Vercel
 - **Gestion des dépendances**: Dependabot
 
 ## 📍 Installation
@@ -76,6 +77,34 @@ npm run dev
 # Pour Windows, utiliser le script PowerShell
 .\Start-App.ps1
 ```
+
+### Déploiement sur Vercel
+
+```bash
+# Installer Vercel CLI (si ce n'est pas déjà fait)
+npm install -g vercel
+
+# Se connecter à Vercel (première utilisation)
+vercel login
+
+# Déployer en production
+vercel --prod
+```
+
+Pour un déploiement automatique, connectez votre dépôt GitHub à Vercel :
+1. Créez un compte sur [Vercel](https://vercel.com)
+2. Importez votre projet GitHub
+3. Configurez les variables d'environnement nécessaires
+4. Vercel déploiera automatiquement à chaque push sur la branche principale
+
+#### Résolution des problèmes de déploiement Vercel
+
+Si vous rencontrez l'erreur `tsconfig.json may not disable emit`, assurez-vous que :
+
+1. Le fichier `tsconfig.node.json` a `"noEmit": false` au lieu de `"noEmit": true`
+2. Un fichier `vercel.json` existe à la racine du projet avec la configuration appropriée
+
+Ces fichiers sont inclus dans le dépôt et devraient permettre un déploiement sans erreur.
 
 ## 🔑 Accès
 
