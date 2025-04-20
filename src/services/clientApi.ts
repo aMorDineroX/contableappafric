@@ -1,4 +1,4 @@
-import { Client, ClientFormData, ClientStatus } from '../types/client';
+import { Client, ClientFormData, ClientStatus, ClientNote } from '../types/client';
 
 // Données fictives pour les clients
 const clientsData: Client[] = [
