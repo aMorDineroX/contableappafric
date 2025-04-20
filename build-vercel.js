@@ -1,33 +1,24 @@
+#!/usr/bin/env node
+
 const { execSync } = require('child_process');
-const fs = require('fs');
-const path = require('path');
 
-// Main build function
-async function build() {
-  try {
-    console.log('Starting Vercel build process...');
+console.log('Starting Vercel build process with direct Vite build...');
 
-    // Skip TypeScript checking completely
-    console.log('Skipping TypeScript checking for Vercel deployment...');
+try {
+  // Exécuter Vite directement sans TypeScript
+  console.log('Running Vite build directly without TypeScript...');
 
-    // Run Vite build directly without TypeScript
-    console.log('Running Vite build directly...');
-    execSync('npx vite build --emptyOutDir', {
-      stdio: 'inherit',
-      env: {
-        ...process.env,
-        VITE_SKIP_TS_CHECK: 'true',
-        CI: 'false',
-        TSC_COMPILE_ON_ERROR: 'true',
-        SKIP_TS_CHECK: 'true'
-      }
-    });
+  // Définir les variables d'environnement pour ignorer les erreurs TypeScript
+  process.env.VITE_SKIP_TS_CHECK = 'true';
+  process.env.CI = 'false';
+  process.env.TSC_COMPILE_ON_ERROR = 'true';
+  process.env.SKIP_TS_CHECK = 'true';
 
-    console.log('Build completed successfully!');
-  } catch (error) {
-    console.error('Build failed:', error);
-    process.exit(1);
-  }
+  // Exécuter la commande Vite build
+  execSync('npx vite build --config vite.config.js', { stdio: 'inherit' });
+
+  console.log('Build completed successfully!');
+} catch (error) {
+  console.error('Build failed:', error);
+  process.exit(1);
 }
-
-build();

@@ -1,5 +1,5 @@
 {
-  "buildCommand": "CI=false NODE_OPTIONS=\"--max-old-space-size=4096\" npm run build:vercel",
+  "buildCommand": "bash vercel-build.sh",
   "outputDirectory": "dist",
   "framework": "vite",
   "installCommand": "npm install",
