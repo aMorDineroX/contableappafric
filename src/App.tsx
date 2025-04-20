@@ -17,8 +17,8 @@ import Reports from './pages/Reports';
 import AdvancedReports from './pages/AdvancedReports';
 import MobilePaymentsPage from './pages/MobilePaymentsPage';
 
-// Pages fictives pour la navigation
-const Settings = () => <div className="p-8"><h1 className="text-3xl font-bold mb-4">Paramètres</h1><p>Cette page est en cours de développement.</p></div>;
+// Pages de l'application
+import SettingsPage from './pages/SettingsPage';
 
 // Wrapper component to access location
 const AnimatedRoutes = () => {
@@ -88,7 +88,7 @@ const AnimatedRoutes = () => {
           <Route path="/settings" element={
             <AuthGuard>
               <Layout>
-                <Settings />
+                <SettingsPage />
               </Layout>
             </AuthGuard>
           } />
