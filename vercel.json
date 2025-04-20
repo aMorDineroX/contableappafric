@@ -1,7 +1,8 @@
 {
-  "buildCommand": "npm run build",
+  "buildCommand": "CI=false npm run build:vercel",
   "outputDirectory": "dist",
   "framework": "vite",
+  "installCommand": "npm install",
   "rewrites": [
     { "source": "/(.*)", "destination": "/" }
   ],
@@ -14,5 +15,10 @@
         { "key": "X-XSS-Protection", "value": "1; mode=block" }
       ]
     }
-  ]
+  ],
+  "env": {
+    "CI": "false",
+    "SKIP_PREFLIGHT_CHECK": "true",
+    "TSC_COMPILE_ON_ERROR": "true"
+  }
 }

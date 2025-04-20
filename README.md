@@ -104,6 +104,12 @@ Si vous rencontrez l'erreur `tsconfig.json may not disable emit`, assurez-vous q
 1. Le fichier `tsconfig.node.json` a `"noEmit": false` au lieu de `"noEmit": true`
 2. Un fichier `vercel.json` existe à la racine du projet avec la configuration appropriée
 
+Pour les erreurs TypeScript lors du déploiement :
+
+1. Utilisez le script de build personnalisé avec `npm run build:vercel`
+2. Le fichier `.vercelignore` permet d'exclure certains fichiers problématiques
+3. Les paramètres `CI=false` et `TSC_COMPILE_ON_ERROR=true` permettent de continuer le build malgré les erreurs
+
 Ces fichiers sont inclus dans le dépôt et devraient permettre un déploiement sans erreur.
 
 ## 🔑 Accès

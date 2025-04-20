@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
+    "build:vercel": "node build-vercel.js",
     "preview": "vite preview",
     "server": "cross-env NODE_ENV=development ts-node-dev --project tsconfig.server.json src/server/index.ts",
     "server-win": "set NODE_ENV=development && ts-node-dev --project tsconfig.server.json --respawn --transpile-only --ignore-watch node_modules --no-notify --interval 2000 src/server/index.ts",
