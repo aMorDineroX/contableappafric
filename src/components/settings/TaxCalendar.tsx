@@ -53,8 +53,8 @@ const TaxCalendar: React.FC<TaxCalendarProps> = ({ selectedCountry }) => {
     const generatedDeadlines: TaxDeadline[] = [];
 
     // Échéances TVA (mensuelles ou trimestrielles selon le pays)
-    if (country === AfricanCountry.SENEGAL || 
-        country === AfricanCountry.COTE_DIVOIRE || 
+    if (country === AfricanCountry.SENEGAL ||
+        country === AfricanCountry.COTE_DIVOIRE ||
         country === AfricanCountry.MALI) {
       // TVA mensuelle (15 du mois suivant)
       for (let month = 0; month < 12; month++) {
@@ -69,8 +69,8 @@ const TaxCalendar: React.FC<TaxCalendarProps> = ({ selectedCountry }) => {
           isRecurring: true
         });
       }
-    } else if (country === AfricanCountry.KENYA || 
-               country === AfricanCountry.GHANA || 
+    } else if (country === AfricanCountry.KENYA ||
+               country === AfricanCountry.GHANA ||
                country === AfricanCountry.NIGERIA) {
       // TVA trimestrielle
       for (let quarter = 0; quarter < 4; quarter++) {
@@ -179,32 +179,32 @@ const TaxCalendar: React.FC<TaxCalendarProps> = ({ selectedCountry }) => {
   };
 
   // Fonction pour générer les jours du mois
-  const generateCalendarDays = () => {
+  const generateCalendarDays = (): (number | null)[] => {
     const year = currentMonth.getFullYear();
     const month = currentMonth.getMonth();
-    
+
     const daysInMonth = getDaysInMonth(year, month);
     const firstDayOfMonth = getFirstDayOfMonth(year, month);
-    
-    const days = [];
-    
+
+    const days: (number | null)[] = [];
+
     // Ajouter les jours vides pour le début du mois
     for (let i = 0; i < firstDayOfMonth; i++) {
       days.push(null);
     }
-    
+
     // Ajouter les jours du mois
     for (let day = 1; day <= daysInMonth; day++) {
       days.push(day);
     }
-    
+
     return days;
   };
 
   // Fonction pour vérifier si une date a des échéances
-  const hasDeadlines = (day: number): boolean => {
-    if (!day) return false;
-    
+  const hasDeadlines = (day: number | null): boolean => {
+    if (day === null) return false;
+
     const date = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), day);
     return deadlines.some(deadline => {
       const deadlineDate = new Date(deadline.dueDate);
@@ -217,9 +217,9 @@ const TaxCalendar: React.FC<TaxCalendarProps> = ({ selectedCountry }) => {
   };
 
   // Fonction pour obtenir les échéances d'une date
-  const getDeadlinesForDay = (day: number): TaxDeadline[] => {
-    if (!day) return [];
-    
+  const getDeadlinesForDay = (day: number | null): TaxDeadline[] => {
+    if (day === null) return [];
+
     const date = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), day);
     return deadlines.filter(deadline => {
       const deadlineDate = new Date(deadline.dueDate);
@@ -304,7 +304,7 @@ const TaxCalendar: React.FC<TaxCalendarProps> = ({ selectedCountry }) => {
   return (
     <div className="bg-white rounded-lg border border-gray-200 p-4">
       <h3 className="text-lg font-medium text-gray-800 mb-3">Calendrier Fiscal</h3>
-      
+
       {!selectedCountry ? (
         <div className="text-center py-8 text-gray-500">
           Veuillez sélectionner un pays pour afficher le calendrier fiscal.
@@ -341,7 +341,7 @@ const TaxCalendar: React.FC<TaxCalendarProps> = ({ selectedCountry }) => {
               <i className="fas fa-chevron-right"></i>
             </button>
           </div>
-          
+
           {/* Calendrier */}
           <div className="overflow-hidden rounded-lg border border-gray-200">
             {/* Jours de la semaine */}
@@ -355,7 +355,7 @@ const TaxCalendar: React.FC<TaxCalendarProps> = ({ selectedCountry }) => {
                 </div>
               ))}
             </div>
-            
+
             {/* Jours du mois */}
             <div className="grid grid-cols-7 bg-white">
               {calendarDays.map((day, index) => (
@@ -398,7 +398,7 @@ const TaxCalendar: React.FC<TaxCalendarProps> = ({ selectedCountry }) => {
               ))}
             </div>
           </div>
-          
+
           {/* Légende */}
           <div className="pt-2 border-t border-gray-200">
             <h4 className="text-sm font-medium text-gray-700 mb-2">Légende</h4>
@@ -429,7 +429,7 @@ const TaxCalendar: React.FC<TaxCalendarProps> = ({ selectedCountry }) => {
               </div>
             </div>
           </div>
-          
+
           {/* Prochaines échéances */}
           <div className="pt-2 border-t border-gray-200">
             <h4 className="text-sm font-medium text-gray-700 mb-2">Prochaines échéances</h4>

@@ -3,6 +3,11 @@ import { useState } from 'react';
 import { formatCurrency } from '../utils/currencies';
 import { Supplier, SupplierStatus } from '../types/supplier';
 import { useCurrency } from '../contexts/CurrencyContext';
+import { motion } from 'framer-motion';
+import { Button } from '../components/ui/button';
+import { Card, CardHeader, CardTitle, CardContent } from '../components/ui/card';
+import SupplierCards from '../components/suppliers/SupplierCards';
+import SupplierFilters from '../components/suppliers/SupplierFilters';
 
 const Suppliers = () => {
   const { currency } = useCurrency();

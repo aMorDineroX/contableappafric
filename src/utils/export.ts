@@ -5,7 +5,7 @@ import { formatCurrency } from './currencies';
 import type { Currency } from './currencies';
 
 // Types pour les données d'exportation
-interface ExportData {
+export interface ExportData {
   title: string;
   subtitle?: string;
   data: any[];

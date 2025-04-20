@@ -1,7 +1,7 @@
 import * as React from "react"
 import { motion } from "framer-motion"
-import { useTheme } from "next-themes"
-import { cn } from "@/lib/utils"
+import { useTheme } from "../ui/theme-provider"
+import { cn } from "../../lib/utils"
 
 interface DataTableProps<TData> extends React.HTMLAttributes<HTMLDivElement> {
   data: TData[]
@@ -27,25 +27,23 @@ export function DataTable<TData>({
     return [...data].sort((a, b) => {
       const aValue = a[sortColumn]
       const bValue = b[sortColumn]
-      return sortDirection === 'asc' 
+      return sortDirection === 'asc'
         ? String(aValue).localeCompare(String(bValue))
         : String(bValue).localeCompare(String(aValue))
     })
   }, [data, sortColumn, sortDirection])
 
   return (
-    <motion.div 
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      className={cn("overflow-x-auto rounded-lg border", className)} 
+    <div
+      className={cn("overflow-x-auto rounded-lg border", className)}
       {...props}
     >
       <table className="w-full border-collapse">
         <thead>
           <tr className="border-b bg-muted/50">
             {columns.map((column) => (
-              <th 
-                key={String(column.accessorKey)} 
+              <th
+                key={String(column.accessorKey)}
                 className="p-4 text-left font-medium cursor-pointer hover:bg-muted/80"
                 onClick={() => {
                   if (sortColumn === column.accessorKey) {
@@ -68,11 +66,8 @@ export function DataTable<TData>({
         </thead>
         <tbody>
           {sortedData.map((row, i) => (
-            <motion.tr 
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.05 }}
-              key={i} 
+            <tr
+              key={i}
               className="border-b transition-colors hover:bg-muted/50"
             >
               {columns.map((column) => (
@@ -82,10 +77,10 @@ export function DataTable<TData>({
                     : String(row[column.accessorKey])}
                 </td>
               ))}
-            </motion.tr>
+            </tr>
           ))}
         </tbody>
       </table>
-    </motion.div>
+    </div>
   )
 }

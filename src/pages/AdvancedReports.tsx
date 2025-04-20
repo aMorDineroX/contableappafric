@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { useCurrency } from '../contexts/CurrencyContext';
-import CurrencySelector from '../components/CurrencySelector';
+import SimpleCurrencySelector from '../components/SimpleCurrencySelector';
 import BalanceSheet from '../components/reports/BalanceSheet';
 import IncomeStatement from '../components/reports/IncomeStatement';
-import { exportToPDF, exportToExcel } from '../utils/export';
+import { exportSimpleToPDF, exportSimpleToExcel } from '../utils/exportAdapters';
 import { FinancialReportAPI } from '../services/financialReportApi';
 
 type ReportType = 'balance-sheet' | 'income-statement';
@@ -13,13 +13,13 @@ const AdvancedReports: React.FC = () => {
   const [reportType, setReportType] = useState<ReportType>('balance-sheet');
   const [isExporting, setIsExporting] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  
+
   // État pour les dates
   const [balanceSheetDate, setBalanceSheetDate] = useState<string>(() => {
     const today = new Date();
     return today.toISOString().split('T')[0];
   });
-  
+
   const [incomeStatementDates, setIncomeStatementDates] = useState<{
     startDate: string;
     endDate: string;
@@ -31,14 +31,14 @@ const AdvancedReports: React.FC = () => {
       endDate: today.toISOString().split('T')[0]
     };
   });
-  
+
   // Fonction pour exporter le bilan en PDF
   const handleExportBalanceSheetPDF = async () => {
     setIsExporting(true);
     setError(null);
     try {
       const balanceSheet = await FinancialReportAPI.getBalanceSheet(balanceSheetDate);
-      
+
       const exportData = {
         title: `Bilan au ${new Date(balanceSheetDate).toLocaleDateString('fr-FR')}`,
         filename: `bilan_${balanceSheetDate.replace(/-/g, '_')}`,
@@ -53,7 +53,7 @@ const AdvancedReports: React.FC = () => {
             item.category
           ]),
           [`TOTAL ACTIFS`, balanceSheet.totalAssets.toLocaleString('fr-FR') + ' ' + currency, ''],
-          
+
           // En-tête pour les passifs
           ['', '', ''],
           ['PASSIFS', '', ''],
@@ -63,7 +63,7 @@ const AdvancedReports: React.FC = () => {
             item.category
           ]),
           [`TOTAL PASSIFS`, balanceSheet.totalLiabilities.toLocaleString('fr-FR') + ' ' + currency, ''],
-          
+
           // En-tête pour les capitaux propres
           ['', '', ''],
           ['CAPITAUX PROPRES', '', ''],
@@ -73,7 +73,7 @@ const AdvancedReports: React.FC = () => {
             item.category
           ]),
           [`TOTAL CAPITAUX PROPRES`, balanceSheet.totalEquity.toLocaleString('fr-FR') + ' ' + currency, ''],
-          
+
           // Équilibre du bilan
           ['', '', ''],
           ['ÉQUILIBRE DU BILAN', '', ''],
@@ -82,8 +82,8 @@ const AdvancedReports: React.FC = () => {
           ['Différence', (balanceSheet.totalAssets - (balanceSheet.totalLiabilities + balanceSheet.totalEquity)).toLocaleString('fr-FR') + ' ' + currency, '']
         ]
       };
-      
-      exportToPDF(exportData);
+
+      exportSimpleToPDF(exportData);
     } catch (err) {
       console.error('Erreur lors de l\'exportation du bilan en PDF:', err);
       setError('Erreur lors de l\'exportation du bilan en PDF. Veuillez réessayer.');
@@ -91,14 +91,14 @@ const AdvancedReports: React.FC = () => {
       setIsExporting(false);
     }
   };
-  
+
   // Fonction pour exporter le bilan en Excel
   const handleExportBalanceSheetExcel = async () => {
     setIsExporting(true);
     setError(null);
     try {
       const balanceSheet = await FinancialReportAPI.getBalanceSheet(balanceSheetDate);
-      
+
       const exportData = {
         title: `Bilan au ${new Date(balanceSheetDate).toLocaleDateString('fr-FR')}`,
         filename: `bilan_${balanceSheetDate.replace(/-/g, '_')}`,
@@ -113,7 +113,7 @@ const AdvancedReports: React.FC = () => {
             item.category
           ]),
           [`TOTAL ACTIFS`, balanceSheet.totalAssets.toLocaleString('fr-FR') + ' ' + currency, ''],
-          
+
           // En-tête pour les passifs
           ['', '', ''],
           ['PASSIFS', '', ''],
@@ -123,7 +123,7 @@ const AdvancedReports: React.FC = () => {
             item.category
           ]),
           [`TOTAL PASSIFS`, balanceSheet.totalLiabilities.toLocaleString('fr-FR') + ' ' + currency, ''],
-          
+
           // En-tête pour les capitaux propres
           ['', '', ''],
           ['CAPITAUX PROPRES', '', ''],
@@ -133,7 +133,7 @@ const AdvancedReports: React.FC = () => {
             item.category
           ]),
           [`TOTAL CAPITAUX PROPRES`, balanceSheet.totalEquity.toLocaleString('fr-FR') + ' ' + currency, ''],
-          
+
           // Équilibre du bilan
           ['', '', ''],
           ['ÉQUILIBRE DU BILAN', '', ''],
@@ -142,8 +142,8 @@ const AdvancedReports: React.FC = () => {
           ['Différence', (balanceSheet.totalAssets - (balanceSheet.totalLiabilities + balanceSheet.totalEquity)).toLocaleString('fr-FR') + ' ' + currency, '']
         ]
       };
-      
-      exportToExcel(exportData);
+
+      exportSimpleToExcel(exportData);
     } catch (err) {
       console.error('Erreur lors de l\'exportation du bilan en Excel:', err);
       setError('Erreur lors de l\'exportation du bilan en Excel. Veuillez réessayer.');
@@ -151,7 +151,7 @@ const AdvancedReports: React.FC = () => {
       setIsExporting(false);
     }
   };
-  
+
   // Fonction pour exporter le compte de résultat en PDF
   const handleExportIncomeStatementPDF = async () => {
     setIsExporting(true);
@@ -161,7 +161,7 @@ const AdvancedReports: React.FC = () => {
         incomeStatementDates.startDate,
         incomeStatementDates.endDate
       );
-      
+
       const exportData = {
         title: `Compte de Résultat du ${new Date(incomeStatementDates.startDate).toLocaleDateString('fr-FR')} au ${new Date(incomeStatementDates.endDate).toLocaleDateString('fr-FR')}`,
         filename: `compte_resultat_${incomeStatementDates.startDate.replace(/-/g, '_')}_${incomeStatementDates.endDate.replace(/-/g, '_')}`,
@@ -176,7 +176,7 @@ const AdvancedReports: React.FC = () => {
             item.category
           ]),
           [`TOTAL REVENUS`, incomeStatement.totalRevenues.toLocaleString('fr-FR') + ' ' + currency, ''],
-          
+
           // En-tête pour les dépenses
           ['', '', ''],
           ['DÉPENSES', '', ''],
@@ -186,7 +186,7 @@ const AdvancedReports: React.FC = () => {
             item.category
           ]),
           [`TOTAL DÉPENSES`, incomeStatement.totalExpenses.toLocaleString('fr-FR') + ' ' + currency, ''],
-          
+
           // En-tête pour les taxes
           ['', '', ''],
           ['TAXES', '', ''],
@@ -196,7 +196,7 @@ const AdvancedReports: React.FC = () => {
             item.category
           ]),
           [`TOTAL TAXES`, incomeStatement.totalTaxes.toLocaleString('fr-FR') + ' ' + currency, ''],
-          
+
           // Résumé du compte de résultat
           ['', '', ''],
           ['RÉSUMÉ', '', ''],
@@ -210,8 +210,8 @@ const AdvancedReports: React.FC = () => {
           ['Résultat Net', incomeStatement.netIncome.toLocaleString('fr-FR') + ' ' + currency, '']
         ]
       };
-      
-      exportToPDF(exportData);
+
+      exportSimpleToPDF(exportData);
     } catch (err) {
       console.error('Erreur lors de l\'exportation du compte de résultat en PDF:', err);
       setError('Erreur lors de l\'exportation du compte de résultat en PDF. Veuillez réessayer.');
@@ -219,7 +219,7 @@ const AdvancedReports: React.FC = () => {
       setIsExporting(false);
     }
   };
-  
+
   // Fonction pour exporter le compte de résultat en Excel
   const handleExportIncomeStatementExcel = async () => {
     setIsExporting(true);
@@ -229,7 +229,7 @@ const AdvancedReports: React.FC = () => {
         incomeStatementDates.startDate,
         incomeStatementDates.endDate
       );
-      
+
       const exportData = {
         title: `Compte de Résultat du ${new Date(incomeStatementDates.startDate).toLocaleDateString('fr-FR')} au ${new Date(incomeStatementDates.endDate).toLocaleDateString('fr-FR')}`,
         filename: `compte_resultat_${incomeStatementDates.startDate.replace(/-/g, '_')}_${incomeStatementDates.endDate.replace(/-/g, '_')}`,
@@ -244,7 +244,7 @@ const AdvancedReports: React.FC = () => {
             item.category
           ]),
           [`TOTAL REVENUS`, incomeStatement.totalRevenues.toLocaleString('fr-FR') + ' ' + currency, ''],
-          
+
           // En-tête pour les dépenses
           ['', '', ''],
           ['DÉPENSES', '', ''],
@@ -254,7 +254,7 @@ const AdvancedReports: React.FC = () => {
             item.category
           ]),
           [`TOTAL DÉPENSES`, incomeStatement.totalExpenses.toLocaleString('fr-FR') + ' ' + currency, ''],
-          
+
           // En-tête pour les taxes
           ['', '', ''],
           ['TAXES', '', ''],
@@ -264,7 +264,7 @@ const AdvancedReports: React.FC = () => {
             item.category
           ]),
           [`TOTAL TAXES`, incomeStatement.totalTaxes.toLocaleString('fr-FR') + ' ' + currency, ''],
-          
+
           // Résumé du compte de résultat
           ['', '', ''],
           ['RÉSUMÉ', '', ''],
@@ -278,8 +278,8 @@ const AdvancedReports: React.FC = () => {
           ['Résultat Net', incomeStatement.netIncome.toLocaleString('fr-FR') + ' ' + currency, '']
         ]
       };
-      
-      exportToExcel(exportData);
+
+      exportSimpleToExcel(exportData);
     } catch (err) {
       console.error('Erreur lors de l\'exportation du compte de résultat en Excel:', err);
       setError('Erreur lors de l\'exportation du compte de résultat en Excel. Veuillez réessayer.');
@@ -287,13 +287,13 @@ const AdvancedReports: React.FC = () => {
       setIsExporting(false);
     }
   };
-  
+
   // Fonction pour définir une période prédéfinie pour le compte de résultat
   const setPresetPeriod = (period: 'month' | 'quarter' | 'year' | 'last-year') => {
     const today = new Date();
     let startDate: Date;
     const endDate = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-    
+
     switch (period) {
       case 'month':
         startDate = new Date(today.getFullYear(), today.getMonth(), 1);
@@ -314,25 +314,24 @@ const AdvancedReports: React.FC = () => {
       default:
         startDate = new Date(today.getFullYear(), today.getMonth() - 11, 1);
     }
-    
+
     setIncomeStatementDates({
       startDate: startDate.toISOString().split('T')[0],
       endDate: endDate.toISOString().split('T')[0]
     });
   };
-  
+
   return (
     <div className="min-h-screen bg-gray-50 py-6">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* En-tête */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
           <h1 className="text-3xl font-bold text-gray-900">Rapports Financiers Avancés</h1>
-          <CurrencySelector
-            selectedCurrency={currency}
+          <SimpleCurrencySelector
             className="w-40"
           />
         </div>
-        
+
         {/* Message d'erreur */}
         {error && (
           <div className="bg-red-50 border-l-4 border-red-500 p-4 mb-6">
@@ -348,7 +347,7 @@ const AdvancedReports: React.FC = () => {
             </div>
           </div>
         )}
-        
+
         {/* Sélection du type de rapport */}
         <div className="bg-white rounded-lg shadow p-6 mb-8">
           <h2 className="text-lg font-medium text-gray-900 mb-4">Type de Rapport</h2>
@@ -381,11 +380,11 @@ const AdvancedReports: React.FC = () => {
             </button>
           </div>
         </div>
-        
+
         {/* Paramètres du rapport */}
         <div className="bg-white rounded-lg shadow p-6 mb-8">
           <h2 className="text-lg font-medium text-gray-900 mb-4">Paramètres du Rapport</h2>
-          
+
           {reportType === 'balance-sheet' ? (
             <div>
               <label htmlFor="balance-sheet-date" className="block text-sm font-medium text-gray-700 mb-1">
@@ -427,7 +426,7 @@ const AdvancedReports: React.FC = () => {
                   />
                 </div>
               </div>
-              
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Périodes Prédéfinies
@@ -462,7 +461,7 @@ const AdvancedReports: React.FC = () => {
             </div>
           )}
         </div>
-        
+
         {/* Contenu du rapport */}
         <div className="bg-white rounded-lg shadow p-6 mb-8">
           {reportType === 'balance-sheet' ? (

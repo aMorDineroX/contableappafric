@@ -8,7 +8,7 @@ import { CategoryAPI, TagAPI, TransactionAPI } from '../../services/api';
 import AttachmentUploader from './AttachmentUploader';
 
 interface TransactionFormProps {
-  initialData?: Partial<TransactionFormData>;
+  initialData?: Partial<TransactionFormData> & { id?: number };
   onSubmit?: (data: TransactionFormData) => void;
   isEditing?: boolean;
 }

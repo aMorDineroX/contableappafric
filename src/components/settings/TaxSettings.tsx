@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { 
-  AfricanCountry, 
-  TaxType, 
-  FilingFrequency, 
+import {
+  AfricanCountry,
+  TaxType,
+  FilingFrequency,
   ComplianceStatus,
   EconomicRegion
 } from '../../types/tax';
@@ -244,12 +244,12 @@ const TaxSettings: React.FC = () => {
   // Fonction pour sauvegarder les paramètres
   const handleSaveSettings = () => {
     setIsSaving(true);
-    
+
     // Simuler une sauvegarde asynchrone
     setTimeout(() => {
       setIsSaving(false);
       setSaveSuccess(true);
-      
+
       // Réinitialiser le message de succès après 3 secondes
       setTimeout(() => {
         setSaveSuccess(false);
@@ -275,7 +275,7 @@ const TaxSettings: React.FC = () => {
   return (
     <div>
       <h2 className="text-2xl font-bold text-gray-800 mb-6">Paramètres Fiscaux</h2>
-      
+
       <div className="space-y-6">
         {/* Sélection du pays */}
         <div className="bg-white rounded-lg border border-gray-200 p-4">
@@ -283,7 +283,7 @@ const TaxSettings: React.FC = () => {
           <p className="text-sm text-gray-600 mb-4">
             Sélectionnez le pays pour lequel vous souhaitez configurer les paramètres fiscaux.
           </p>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label htmlFor="country" className="block text-sm font-medium text-gray-700 mb-1">
@@ -304,7 +304,7 @@ const TaxSettings: React.FC = () => {
               </select>
             </div>
           </div>
-          
+
           {selectedCountry && (
             <div className="mt-4 p-3 bg-blue-50 rounded-lg">
               <h4 className="font-medium text-blue-800 mb-2">Informations sur {countryTaxData[selectedCountry as AfricanCountry].name}</h4>
@@ -345,7 +345,7 @@ const TaxSettings: React.FC = () => {
                   </label>
                 </div>
               </div>
-              
+
               {vatEnabled && (
                 <div className="space-y-4 mt-4">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -381,7 +381,7 @@ const TaxSettings: React.FC = () => {
                       </select>
                     </div>
                   </div>
-                  
+
                   <div className="flex items-center">
                     <input
                       type="checkbox"
@@ -413,7 +413,7 @@ const TaxSettings: React.FC = () => {
                   </label>
                 </div>
               </div>
-              
+
               {corporateTaxEnabled && (
                 <div className="space-y-4 mt-4">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -467,7 +467,7 @@ const TaxSettings: React.FC = () => {
                   </label>
                 </div>
               </div>
-              
+
               {withholdingTaxEnabled && (
                 <div className="space-y-4 mt-4">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -502,7 +502,7 @@ const TaxSettings: React.FC = () => {
                       </select>
                     </div>
                   </div>
-                  
+
                   <div className="flex items-center">
                     <input
                       type="checkbox"
@@ -527,7 +527,7 @@ const TaxSettings: React.FC = () => {
             disabled={isSaving || !selectedCountry}
             className={`px-6 py-2 rounded-lg font-medium transition-colors ${
               isSaving || !selectedCountry
-                ? 'bg-gray-300 text-gray-700 cursor-not-allowed' 
+                ? 'bg-gray-300 text-gray-700 cursor-not-allowed'
                 : 'bg-blue-600 text-white hover:bg-blue-700'
             }`}
           >
@@ -552,20 +552,20 @@ const TaxSettings: React.FC = () => {
       </div>
 
       {/* Styles pour les interrupteurs */}
-      <style jsx>{`
+      <style dangerouslySetInnerHTML={{ __html: `
         .switch {
           position: relative;
           display: inline-block;
           width: 48px;
           height: 24px;
         }
-        
+
         .switch input {
           opacity: 0;
           width: 0;
           height: 0;
         }
-        
+
         .slider {
           position: absolute;
           cursor: pointer;
@@ -576,7 +576,7 @@ const TaxSettings: React.FC = () => {
           background-color: #ccc;
           transition: .4s;
         }
-        
+
         .slider:before {
           position: absolute;
           content: "";
@@ -587,27 +587,27 @@ const TaxSettings: React.FC = () => {
           background-color: white;
           transition: .4s;
         }
-        
+
         input:checked + .slider {
           background-color: #3b82f6;
         }
-        
+
         input:focus + .slider {
           box-shadow: 0 0 1px #3b82f6;
         }
-        
+
         input:checked + .slider:before {
           transform: translateX(24px);
         }
-        
+
         .slider.round {
           border-radius: 24px;
         }
-        
+
         .slider.round:before {
           border-radius: 50%;
         }
-      `}</style>
+      ` }} />
     </div>
   );
 };

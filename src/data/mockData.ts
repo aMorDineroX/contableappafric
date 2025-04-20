@@ -122,7 +122,7 @@ const getRandomCurrency = (): Currency => {
     // Devises internationales
     'USD', 'EUR',
     // Crypto (plus rare)
-    ...(Math.random() < 0.05 ? ['BTC'] : [])
+    ...(Math.random() < 0.05 ? ['BTC' as Currency] : [])
   ];
   const randomIndex = Math.floor(Math.random() * currencies.length);
   return currencies[randomIndex];

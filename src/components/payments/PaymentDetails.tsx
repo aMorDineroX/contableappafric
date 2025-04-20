@@ -85,7 +85,7 @@ const PaymentDetails: React.FC<PaymentDetailsProps> = ({
 
   // Mettre en place un polling pour les paiements en cours
   useEffect(() => {
-    if (!payment) return;
+    if (!payment) return undefined;
 
     // Si le paiement est en attente, initié ou en cours, mettre en place un polling
     const shouldPoll = [
@@ -113,6 +113,8 @@ const PaymentDetails: React.FC<PaymentDetailsProps> = ({
         setIsPolling(false);
       };
     }
+
+    return undefined;
   }, [payment, paymentId]);
 
   // Gérer l'annulation du paiement

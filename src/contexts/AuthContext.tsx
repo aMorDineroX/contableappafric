@@ -9,6 +9,8 @@ interface AuthContextType {
   register: (email: string, password: string, name: string) => Promise<boolean>;
   logout: () => void;
   loginDemo: () => void; // Fonction de connexion temporaire pour démonstration
+  resetPassword: (email: string) => Promise<boolean>;
+  sendVerificationEmail: () => Promise<boolean>
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -146,8 +148,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }, 100);
   };
 
+  // Fonction pour réinitialiser le mot de passe
+  const resetPassword = async (email: string): Promise<boolean> => {
+    console.log('Réinitialisation du mot de passe pour:', email);
+    // Simuler une réinitialisation réussie
+    return true;
+  };
+
+  // Fonction pour envoyer un email de vérification
+  const sendVerificationEmail = async (): Promise<boolean> => {
+    console.log('Envoi d\'un email de vérification à:', user?.email);
+    // Simuler un envoi réussi
+    return true;
+  };
+
   return (
-    <AuthContext.Provider value={{ isAuthenticated, user, loading, login, register, logout, loginDemo }}>
+    <AuthContext.Provider value={{ isAuthenticated, user, loading, login, register, logout, loginDemo, resetPassword, sendVerificationEmail }}>
       {children}
     </AuthContext.Provider>
   );

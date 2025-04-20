@@ -86,9 +86,9 @@ const NotificationSettings: React.FC = () => {
   // Fonction pour mettre à jour un paramètre de notification
   const updateNotificationSetting = (id: string, channel: 'email' | 'inApp' | 'sms', value: boolean) => {
     setNotificationSettings(
-      notificationSettings.map(setting => 
-        setting.id === id 
-          ? { ...setting, [channel]: value } 
+      notificationSettings.map(setting =>
+        setting.id === id
+          ? { ...setting, [channel]: value }
           : setting
       )
     );
@@ -125,12 +125,12 @@ const NotificationSettings: React.FC = () => {
   // Fonction pour sauvegarder les paramètres
   const handleSaveSettings = () => {
     setIsSaving(true);
-    
+
     // Simuler une sauvegarde asynchrone
     setTimeout(() => {
       setIsSaving(false);
       setSaveSuccess(true);
-      
+
       // Réinitialiser le message de succès après 3 secondes
       setTimeout(() => {
         setSaveSuccess(false);
@@ -141,7 +141,7 @@ const NotificationSettings: React.FC = () => {
   return (
     <div>
       <h2 className="text-2xl font-bold text-gray-800 mb-6">Paramètres de Notification</h2>
-      
+
       <div className="space-y-6">
         {/* Canaux de notification */}
         <div className="bg-white rounded-lg border border-gray-200 p-4">
@@ -149,7 +149,7 @@ const NotificationSettings: React.FC = () => {
           <p className="text-sm text-gray-600 mb-4">
             Choisissez comment vous souhaitez recevoir les notifications.
           </p>
-          
+
           <div className="space-y-4">
             <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
               <div>
@@ -167,7 +167,7 @@ const NotificationSettings: React.FC = () => {
                 </label>
               </div>
             </div>
-            
+
             <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
               <div>
                 <h4 className="font-medium text-gray-800">Notifications dans l'Application</h4>
@@ -184,7 +184,7 @@ const NotificationSettings: React.FC = () => {
                 </label>
               </div>
             </div>
-            
+
             <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
               <div>
                 <h4 className="font-medium text-gray-800">Notifications par SMS</h4>
@@ -201,7 +201,7 @@ const NotificationSettings: React.FC = () => {
                 </label>
               </div>
             </div>
-            
+
             {smsNotifications && (
               <div className="mt-4">
                 <label htmlFor="phoneNumber" className="block text-sm font-medium text-gray-700 mb-1">
@@ -229,7 +229,7 @@ const NotificationSettings: React.FC = () => {
           <p className="text-sm text-gray-600 mb-4">
             Personnalisez les types de notifications que vous souhaitez recevoir.
           </p>
-          
+
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
@@ -292,7 +292,7 @@ const NotificationSettings: React.FC = () => {
         {/* Fréquence des notifications */}
         <div className="bg-white rounded-lg border border-gray-200 p-4">
           <h3 className="text-lg font-medium text-gray-800 mb-3">Fréquence des Notifications</h3>
-          
+
           <div className="space-y-4">
             <div>
               <label htmlFor="emailFrequency" className="block text-sm font-medium text-gray-700 mb-1">
@@ -310,7 +310,7 @@ const NotificationSettings: React.FC = () => {
                 <option value="never">Jamais</option>
               </select>
             </div>
-            
+
             <div className="flex items-center">
               <input
                 type="checkbox"
@@ -322,7 +322,7 @@ const NotificationSettings: React.FC = () => {
                 Mode résumé (regrouper les notifications similaires)
               </label>
             </div>
-            
+
             <div className="flex items-center">
               <input
                 type="checkbox"
@@ -343,8 +343,8 @@ const NotificationSettings: React.FC = () => {
             onClick={handleSaveSettings}
             disabled={isSaving}
             className={`px-6 py-2 rounded-lg font-medium transition-colors ${
-              isSaving 
-                ? 'bg-gray-300 text-gray-700 cursor-not-allowed' 
+              isSaving
+                ? 'bg-gray-300 text-gray-700 cursor-not-allowed'
                 : 'bg-blue-600 text-white hover:bg-blue-700'
             }`}
           >
@@ -369,20 +369,20 @@ const NotificationSettings: React.FC = () => {
       </div>
 
       {/* Styles pour les interrupteurs */}
-      <style jsx>{`
+      <style dangerouslySetInnerHTML={{ __html: `
         .switch {
           position: relative;
           display: inline-block;
           width: 48px;
           height: 24px;
         }
-        
+
         .switch input {
           opacity: 0;
           width: 0;
           height: 0;
         }
-        
+
         .slider {
           position: absolute;
           cursor: pointer;
@@ -393,7 +393,7 @@ const NotificationSettings: React.FC = () => {
           background-color: #ccc;
           transition: .4s;
         }
-        
+
         .slider:before {
           position: absolute;
           content: "";
@@ -404,27 +404,27 @@ const NotificationSettings: React.FC = () => {
           background-color: white;
           transition: .4s;
         }
-        
+
         input:checked + .slider {
           background-color: #3b82f6;
         }
-        
+
         input:focus + .slider {
           box-shadow: 0 0 1px #3b82f6;
         }
-        
+
         input:checked + .slider:before {
           transform: translateX(24px);
         }
-        
+
         .slider.round {
           border-radius: 24px;
         }
-        
+
         .slider.round:before {
           border-radius: 50%;
         }
-      `}</style>
+      ` }} />
     </div>
   );
 };

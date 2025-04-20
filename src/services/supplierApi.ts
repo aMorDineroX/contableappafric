@@ -190,7 +190,7 @@ export const SupplierAPI = {
     await delay(500);
     return [...suppliersData];
   },
-  
+
   // Récupérer un fournisseur par son ID
   getById: async (id: number): Promise<Supplier> => {
     await delay(300);
@@ -200,14 +200,14 @@ export const SupplierAPI = {
     }
     return { ...supplier };
   },
-  
+
   // Créer un nouveau fournisseur
   create: async (data: SupplierFormData): Promise<Supplier> => {
     await delay(800);
-    
+
     const newId = Math.max(...suppliersData.map(s => s.id)) + 1;
     const now = new Date().toISOString();
-    
+
     const newSupplier: Supplier = {
       id: newId,
       ...data,
@@ -215,88 +215,92 @@ export const SupplierAPI = {
       outstandingPayable: 0,
       lastOrderDate: now,
       createdAt: now,
-      updatedAt: now
+      updatedAt: now,
+      notes: typeof data.notes === 'string' ? [] : data.notes || []
     };
-    
+
     suppliersData.push(newSupplier);
     return { ...newSupplier };
   },
-  
+
   // Mettre à jour un fournisseur existant
   update: async (id: number, data: Partial<SupplierFormData>): Promise<Supplier> => {
     await delay(800);
-    
+
     const index = suppliersData.findIndex(s => s.id === id);
     if (index === -1) {
       throw new Error(`Fournisseur avec l'ID ${id} non trouvé`);
     }
-    
+
     const updatedSupplier = {
       ...suppliersData[index],
       ...data,
-      updatedAt: new Date().toISOString()
+      updatedAt: new Date().toISOString(),
+      notes: typeof data.notes === 'string'
+        ? suppliersData[index].notes || []
+        : data.notes || suppliersData[index].notes || []
     };
-    
+
     suppliersData[index] = updatedSupplier;
     return { ...updatedSupplier };
   },
-  
+
   // Supprimer un fournisseur
   delete: async (id: number): Promise<void> => {
     await delay(500);
-    
+
     const index = suppliersData.findIndex(s => s.id === id);
     if (index === -1) {
       throw new Error(`Fournisseur avec l'ID ${id} non trouvé`);
     }
-    
+
     suppliersData.splice(index, 1);
   },
-  
+
   // Ajouter une note à un fournisseur
   addNote: async (supplierId: number, content: string): Promise<SupplierNote> => {
     await delay(300);
-    
+
     const supplier = suppliersData.find(s => s.id === supplierId);
     if (!supplier) {
       throw new Error(`Fournisseur avec l'ID ${supplierId} non trouvé`);
     }
-    
+
     const newNote: SupplierNote = {
       id: supplier.notes ? Math.max(...supplier.notes.map(n => n.id)) + 1 : 1,
       content,
       createdAt: new Date().toISOString(),
       createdBy: 'Utilisateur'
     };
-    
+
     if (!supplier.notes) {
       supplier.notes = [];
     }
-    
+
     supplier.notes.push(newNote);
     return { ...newNote };
   },
-  
+
   // Récupérer les fournisseurs par pays
   getByCountry: async (country: string): Promise<Supplier[]> => {
     await delay(300);
     return suppliersData.filter(s => s.country.toLowerCase() === country.toLowerCase());
   },
-  
+
   // Récupérer les fournisseurs par catégorie
   getByCategory: async (category: string): Promise<Supplier[]> => {
     await delay(300);
     return suppliersData.filter(s => s.category.toLowerCase() === category.toLowerCase());
   },
-  
+
   // Rechercher des fournisseurs
   search: async (query: string): Promise<Supplier[]> => {
     await delay(500);
-    
+
     if (!query) return [...suppliersData];
-    
+
     const lowerQuery = query.toLowerCase();
-    return suppliersData.filter(supplier => 
+    return suppliersData.filter(supplier =>
       supplier.name.toLowerCase().includes(lowerQuery) ||
       supplier.email.toLowerCase().includes(lowerQuery) ||
       supplier.country.toLowerCase().includes(lowerQuery) ||

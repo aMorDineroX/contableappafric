@@ -573,7 +573,10 @@ const TransactionsPage: React.FC = () => {
                 </button>
               </div>
               <TransactionForm
-                initialData={selectedTransaction || undefined}
+                initialData={selectedTransaction ? {
+                  ...selectedTransaction,
+                  attachments: undefined // Remove attachments from initialData
+                } : undefined}
                 onSubmit={handleFormSubmit}
                 isEditing={isEditMode}
               />

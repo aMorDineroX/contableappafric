@@ -238,7 +238,7 @@ export const ClientAPI = {
     await delay(500);
     return [...clientsData];
   },
-  
+
   // Récupérer un client par son ID
   getById: async (id: number): Promise<Client> => {
     await delay(300);
@@ -248,14 +248,14 @@ export const ClientAPI = {
     }
     return { ...client };
   },
-  
+
   // Créer un nouveau client
   create: async (clientData: ClientFormData): Promise<Client> => {
     await delay(800);
-    
+
     const newId = Math.max(...clientsData.map(c => c.id), 0) + 1;
     const now = new Date().toISOString();
-    
+
     const newClient: Client = {
       id: newId,
       ...clientData,
@@ -263,88 +263,92 @@ export const ClientAPI = {
       outstandingBalance: 0,
       lastOrderDate: now,
       createdAt: now,
-      updatedAt: now
+      updatedAt: now,
+      notes: typeof clientData.notes === 'string' ? [] : clientData.notes || []
     };
-    
+
     clientsData.push(newClient);
     return { ...newClient };
   },
-  
+
   // Mettre à jour un client
   update: async (id: number, clientData: Partial<ClientFormData>): Promise<Client> => {
     await delay(800);
-    
+
     const index = clientsData.findIndex(c => c.id === id);
     if (index === -1) {
       throw new Error(`Client avec l'ID ${id} non trouvé`);
     }
-    
+
     const updatedClient = {
       ...clientsData[index],
       ...clientData,
-      updatedAt: new Date().toISOString()
+      updatedAt: new Date().toISOString(),
+      notes: typeof clientData.notes === 'string'
+        ? clientsData[index].notes || []
+        : clientData.notes || clientsData[index].notes || []
     };
-    
+
     clientsData[index] = updatedClient;
     return { ...updatedClient };
   },
-  
+
   // Supprimer un client
   delete: async (id: number): Promise<void> => {
     await delay(500);
-    
+
     const index = clientsData.findIndex(c => c.id === id);
     if (index === -1) {
       throw new Error(`Client avec l'ID ${id} non trouvé`);
     }
-    
+
     clientsData.splice(index, 1);
   },
-  
+
   // Ajouter une note à un client
   addNote: async (clientId: number, content: string): Promise<ClientNote> => {
     await delay(300);
-    
+
     const client = clientsData.find(c => c.id === clientId);
     if (!client) {
       throw new Error(`Client avec l'ID ${clientId} non trouvé`);
     }
-    
+
     const newNote: ClientNote = {
       id: Math.max(...(client.notes?.map(n => n.id) || [0]), 0) + 1,
       content,
       createdAt: new Date().toISOString(),
       createdBy: 'Utilisateur actuel' // À remplacer par l'utilisateur réel
     };
-    
+
     if (!client.notes) {
       client.notes = [];
     }
-    
+
     client.notes.push(newNote);
     return { ...newNote };
   },
-  
+
   // Récupérer les clients par statut
   getByStatus: async (status: ClientStatus): Promise<Client[]> => {
     await delay(300);
     return clientsData.filter(c => c.status === status);
   },
-  
+
   // Récupérer les clients par pays
   getByCountry: async (country: string): Promise<Client[]> => {
     await delay(300);
     return clientsData.filter(c => c.country.toLowerCase() === country.toLowerCase());
   },
-  
+
   // Rechercher des clients
   search: async (query: string): Promise<Client[]> => {
     await delay(500);
-    
+
     if (!query) return [...clientsData];
-    
+
     const lowerQuery = query.toLowerCase();
-    return clientsData.filter(client => 
+    return clientsData.filter(client =>
       client.name.toLowerCase().includes(lowerQuery) ||
       client.email.toLowerCase().includes(lowerQuery) ||
       client.country.toLowerCase().includes(lowerQuery) ||

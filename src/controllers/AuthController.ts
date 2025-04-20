@@ -37,12 +37,12 @@ export class AuthController {
         { expiresIn: '24h' }
       );
 
-      res.status(201).json({
+      return res.status(201).json({
         user: result.rows[0],
         token
       });
     } catch (err) {
-      res.status(500).json({ error: err.message });
+      return res.status(500).json({ error: (err as Error).message });
     }
   }
 
@@ -72,7 +72,7 @@ export class AuthController {
         { expiresIn: '24h' }
       );
 
-      res.json({
+      return res.json({
         user: {
           id: user.id,
           email: user.email,
@@ -81,22 +81,22 @@ export class AuthController {
         token
       });
     } catch (err) {
-      res.status(500).json({ error: err.message });
+      return res.status(500).json({ error: (err as Error).message });
     }
   }
 
   async verifyToken(req: Request, res: Response) {
     const token = req.headers.authorization?.split(' ')[1];
-    
+
     if (!token) {
       return res.status(401).json({ error: 'Token non fourni' });
     }
 
     try {
       const decoded = jwt.verify(token, JWT_SECRET);
-      res.json({ valid: true, decoded });
+      return res.json({ valid: true, decoded });
     } catch (err) {
-      res.status(401).json({ valid: false, error: 'Token invalide' });
+      return res.status(401).json({ valid: false, error: 'Token invalide' });
     }
   }
 }

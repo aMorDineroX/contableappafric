@@ -711,7 +711,12 @@ const SupplierPage = () => {
         {/* Modal de formulaire (ajout/modification) */}
         {isFormModalOpen && (
           <SupplierForm
-            initialData={editingSupplier || undefined}
+            initialData={editingSupplier ? {
+              ...editingSupplier,
+              notes: Array.isArray(editingSupplier.notes)
+                ? editingSupplier.notes.map(note => note.content).join('\n')
+                : editingSupplier.notes
+            } : undefined}
             isSubmitting={isSubmitting}
             onSubmit={handleSubmitSupplier}
             onCancel={() => setIsFormModalOpen(false)}

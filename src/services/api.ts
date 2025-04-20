@@ -72,6 +72,7 @@ export const TransactionAPI = {
       status: 'VALIDEE',
       category,
       tags,
+      attachments: [],
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString()
     };
