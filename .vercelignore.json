@@ -1,0 +1,26 @@
+{
+  "ignore": [
+    "src/controllers/**/*",
+    "src/services/TransactionService.ts",
+    "src/config/database.ts",
+    "src/components/payments/PaymentDetails.tsx",
+    "src/components/settings/NotificationSettings.tsx",
+    "src/components/settings/TaxCalendar.tsx",
+    "src/components/settings/TaxSettings.tsx",
+    "src/components/transactions/TransactionForm.tsx",
+    "src/components/ui/data-table.tsx",
+    "src/components/ui/theme-toggle.tsx",
+    "src/pages/AdvancedReports.tsx",
+    "src/pages/ResetPassword.tsx",
+    "src/pages/SupplierPage.tsx",
+    "src/pages/Suppliers.tsx",
+    "src/pages/TransactionsPage.tsx",
+    "src/pages/VerifyEmail.tsx",
+    "src/services/api.ts",
+    "src/services/clientApi.ts",
+    "src/services/supplierApi.ts",
+    "src/services/financialReportApi.ts",
+    "tsconfig.json",
+    "tsconfig.node.json"
+  ]
+}

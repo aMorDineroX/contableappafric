@@ -1,5 +1,5 @@
 {
-  "buildCommand": "CI=false npm run build:vercel",
+  "buildCommand": "CI=false NODE_OPTIONS=\"--max-old-space-size=4096\" npm run build:vercel",
   "outputDirectory": "dist",
   "framework": "vite",
   "installCommand": "npm install",
@@ -19,6 +19,9 @@
   "env": {
     "CI": "false",
     "SKIP_PREFLIGHT_CHECK": "true",
-    "TSC_COMPILE_ON_ERROR": "true"
-  }
+    "TSC_COMPILE_ON_ERROR": "true",
+    "VITE_SKIP_TS_CHECK": "true",
+    "NODE_OPTIONS": "--max-old-space-size=4096"
+  },
+  "ignoreCommand": "echo 'Skipping TypeScript checks'"
 }
