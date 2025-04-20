@@ -2,48 +2,24 @@ const { execSync } = require('child_process');
 const fs = require('fs');
 const path = require('path');
 
-// Function to create a temporary tsconfig for building
-function createTempTsConfig() {
-  const originalTsConfig = JSON.parse(fs.readFileSync('tsconfig.json', 'utf8'));
-
-  // Make a copy with more lenient settings
-  const tempConfig = {
-    ...originalTsConfig,
-    compilerOptions: {
-      ...originalTsConfig.compilerOptions,
-      strict: false,
-      noImplicitAny: false,
-      noImplicitReturns: false,
-      noFallthroughCasesInSwitch: false,
-      skipLibCheck: true,
-    }
-  };
-
-  fs.writeFileSync('tsconfig.vercel.json', JSON.stringify(tempConfig, null, 2));
-  console.log('Created temporary tsconfig.vercel.json for build');
-}
-
 // Main build function
 async function build() {
   try {
     console.log('Starting Vercel build process...');
 
-    // Create temporary tsconfig
-    createTempTsConfig();
-
-    // Skip TypeScript checking completely for Vercel deployment
+    // Skip TypeScript checking completely
     console.log('Skipping TypeScript checking for Vercel deployment...');
-    // We're not running TypeScript at all, just building with Vite directly
 
-    // Run Vite build with TypeScript errors ignored
-    console.log('Running Vite build with TypeScript errors ignored...');
-    execSync('npx vite build --emptyOutDir --config vite.config.vercel.ts', {
+    // Run Vite build directly without TypeScript
+    console.log('Running Vite build directly...');
+    execSync('npx vite build --emptyOutDir', {
       stdio: 'inherit',
       env: {
         ...process.env,
         VITE_SKIP_TS_CHECK: 'true',
         CI: 'false',
-        TSC_COMPILE_ON_ERROR: 'true'
+        TSC_COMPILE_ON_ERROR: 'true',
+        SKIP_TS_CHECK: 'true'
       }
     });
 

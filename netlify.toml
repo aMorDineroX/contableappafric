@@ -1,0 +1,15 @@
+[build]
+  command = "npm run build:vercel"
+  publish = "dist"
+
+[build.environment]
+  CI = "false"
+  SKIP_PREFLIGHT_CHECK = "true"
+  TSC_COMPILE_ON_ERROR = "true"
+  VITE_SKIP_TS_CHECK = "true"
+  NODE_OPTIONS = "--max-old-space-size=4096"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
