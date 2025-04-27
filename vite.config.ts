@@ -31,7 +31,7 @@ export default defineConfig({
     target: 'es2015',
   },
   esbuild: {
-    jsxInject: `import React from 'react'`,
+    // Removed jsxInject to prevent duplicate React imports
     logOverride: {
       'this-is-undefined-in-esm': 'silent',
     },
